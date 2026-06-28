@@ -1,0 +1,13 @@
+{
+	"services": {
+		"Spotify": {
+			"emoji": "<:spotify:1520657550175899829>"
+		},
+		"Apple Music": {
+			"emoji": "<:applemusic:1520657529690918912>"
+		},
+		"YouTube Music": {
+			"emoji": "<:ytmusic:1520657498208604291>"
+		}
+	}
+}
