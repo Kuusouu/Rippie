@@ -305,7 +305,10 @@ for (const folder of commandFolders) {
 }
 
 client.on(Events.InteractionCreate, async (interaction) => {
-	if ('customId' in interaction && interaction.customId.startsWith('settings:')) {
+	if (
+		'customId' in interaction &&
+		interaction.customId.startsWith('settings:')
+	) {
 		if (!hasSettingsAccess(interaction)) {
 			await interaction.reply({
 				content: 'You do not have access to change settings here.',
