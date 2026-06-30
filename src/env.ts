@@ -17,6 +17,10 @@ const envSchema = z.object({
 			(guilds) => guilds.length > 0,
 			'GUILDS must contain at least one valid guild ID',
 		),
+	SPOTIFY_CLIENT_ID: z.string().min(1, 'SPOTIFY_CLIENT_ID cannot be empty'),
+	SPOTIFY_CLIENT_SECRET: z
+		.string()
+		.min(1, 'SPOTIFY_CLIENT_SECRET cannot be empty'),
 });
 
 export const env = envSchema.parse(process.env);
