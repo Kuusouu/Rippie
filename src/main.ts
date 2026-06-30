@@ -253,6 +253,10 @@ const buildSettingsRolesPayload = (selectedRoles: string[]) => {
 		.setMinValues(0)
 		.setMaxValues(25);
 
+	if (selectedRoles.length > 0) {
+		selectMenu.setDefaultRoles(selectedRoles);
+	}
+
 	const selectRow =
 		new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(selectMenu);
 
@@ -301,9 +305,7 @@ for (const folder of commandFolders) {
 }
 
 client.on(Events.InteractionCreate, async (interaction) => {
-	if (interaction.isChannelSelectMenu()) {
-		if (interaction.customId !== 'settings:music_channel') return;
-
+	if ('customId' in interaction && interaction.customId.startsWith('settings:')) {
 		if (!hasSettingsAccess(interaction)) {
 			await interaction.reply({
 				content: 'You do not have access to change settings here.',
@@ -311,6 +313,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 			});
 			return;
 		}
+	}
+
+	if (interaction.isChannelSelectMenu()) {
+		if (interaction.customId !== 'settings:music_channel') return;
 
 		const selectedChannelId = interaction.values[0];
 		if (interaction.guildId) {
@@ -330,14 +336,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
 	if (interaction.isRoleSelectMenu()) {
 		if (interaction.customId !== 'settings:settings_roles') return;
 
-		if (!hasSettingsAccess(interaction)) {
-			await interaction.reply({
-				content: 'You do not have access to change settings here.',
-				flags: MessageFlags.Ephemeral,
-			});
-			return;
-		}
-
 		const key = getSelectionKey(interaction.guildId, interaction.user.id);
 		pendingSettingsRoleSelections.set(key, interaction.values);
 
@@ -349,14 +347,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 	if (interaction.isStringSelectMenu()) {
 		if (interaction.customId === 'settings:music_services') {
-			if (!hasSettingsAccess(interaction)) {
-				await interaction.reply({
-					content: 'You do not have access to change settings here.',
-					flags: MessageFlags.Ephemeral,
-				});
-				return;
-			}
-
 			const key = getSelectionKey(
 				interaction.guildId,
 				interaction.user.id,
@@ -370,14 +360,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
 		}
 
 		if (interaction.customId !== 'settings:category') return;
-
-		if (!hasSettingsAccess(interaction)) {
-			await interaction.reply({
-				content: 'You do not have access to change settings here.',
-				flags: MessageFlags.Ephemeral,
-			});
-			return;
-		}
 
 		const selectedChoice = interaction.values[0];
 		if (selectedChoice === 'music_channel') {
@@ -442,14 +424,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
 			!interaction.customId.startsWith('settings:music_services:') &&
 			!interaction.customId.startsWith('settings:settings_roles:')
 		) {
-			return;
-		}
-
-		if (!hasSettingsAccess(interaction)) {
-			await interaction.reply({
-				content: 'You do not have access to change settings here.',
-				flags: MessageFlags.Ephemeral,
-			});
 			return;
 		}
 
