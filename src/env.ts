@@ -13,7 +13,10 @@ const envSchema = z.object({
 				.map((guildId) => guildId.trim())
 				.filter(Boolean),
 		)
-		.refine((guilds) => guilds.length > 0, 'GUILDS must contain at least one valid guild ID'),
+		.refine(
+			(guilds) => guilds.length > 0,
+			'GUILDS must contain at least one valid guild ID',
+		),
 });
 
 export const env = envSchema.parse(process.env);

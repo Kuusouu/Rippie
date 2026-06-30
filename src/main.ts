@@ -1,12 +1,12 @@
 import { Client, Collection, GatewayIntentBits } from 'discord.js';
-import { env } from './env';
 import fs from 'node:fs';
 import path from 'node:path';
+import { env } from './env';
 
 import { loadBotConfig, loadSettings } from './config';
-import { registerMessageHandler } from './events/messageCreate';
 import { registerClientReadyHandler } from './events/clientReady';
 import { registerInteractionCreateHandler } from './events/interactionCreate';
+import { registerMessageHandler } from './events/messageCreate';
 
 const client = new Client({
 	intents: [
