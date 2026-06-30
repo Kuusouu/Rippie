@@ -14,11 +14,12 @@ Platform buttons are configurable per server, so you only see the ones that matt
 
 ## Planned features
 
-- Detect music links from major platforms automatically
-- Resolve cross-platform equivalents by communicating directly with each platform's API
-- Reply with platform buttons (Spotify, YouTube Music, Apple Music, SoundCloud, Tidal, and more)
-- Per-server configuration for which platforms to show
-- Per-server configuration for which channel Rippie listens in, because scanning an entire server would be exhausting on resources and noisy for everyone!
+- [ ] Detect music links from major platforms automatically
+- [ ] Resolve cross-platform equivalents by communicating directly with each platform's API
+- [ ] Reply with platform buttons (Spotify, YouTube Music, Apple Music, SoundCloud, Tidal, and more)
+- [x] Per-server configuration for which platforms to show
+- [x] Per-server configuration for which channel Rippie listens in, because scanning an entire server would be exhausting on resources and noisy for everyone!
+- [x] Per-server configuration for which roles can manage settings
 
 ## A note on the journey
 
@@ -38,3 +39,7 @@ Currently researching the mainstream platform APIs to understand how to fetch an
 ## Contributing
 
 Not ready for contributions yet, but feel free to open issues with ideas or feedback.
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
