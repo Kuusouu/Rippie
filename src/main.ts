@@ -24,9 +24,14 @@ import {
 	saveSettings,
 } from './config';
 import { getSavedSettingsRoles, hasSettingsAccess } from './permissions';
+import { registerMessageHandler } from './events/messageCreate';
 
 const client = new Client({
-	intents: [GatewayIntentBits.Guilds],
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.MessageContent,
+	],
 });
 
 const commandFileExtensions = ['.js', '.ts'];
@@ -155,6 +160,8 @@ client.config = loadBotConfig();
 client.once(Events.ClientReady, (readyClient: Client<true>) => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
+
+registerMessageHandler(client);
 
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
