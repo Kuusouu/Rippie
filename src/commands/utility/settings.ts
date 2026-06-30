@@ -1,8 +1,10 @@
 import {
 	ActionRowBuilder,
 	ChatInputCommandInteraction,
+	Collection,
 	EmbedBuilder,
 	MessageFlags,
+	PermissionsBitField,
 	SlashCommandBuilder,
 	StringSelectMenuBuilder,
 } from 'discord.js';
@@ -17,7 +19,118 @@ type BotConfig = {
 	services?: Record<string, ServiceConfig>;
 };
 
+type GuildSettings = {
+	musicChannelId?: string;
+	services?: Record<string, boolean>;
+	settingsRoleIds?: string[];
+};
+
+type SettingsStore = Record<string, GuildSettings>;
+
 const configPath = path.join(__dirname, '../../../config.json');
+const settingsPath = path.join(__dirname, '../../../settings.json');
+
+const loadSettings = (): SettingsStore => {
+	if (!fs.existsSync(settingsPath)) {
+		return {};
+	}
+
+	try {
+		return JSON.parse(
+			fs.readFileSync(settingsPath, 'utf8'),
+		) as SettingsStore;
+	} catch (error) {
+		console.error(
+			'Failed to load settings.json, continuing without roles.',
+			error,
+		);
+		return {};
+	}
+};
+
+const buildSettingsRolesText = (settingsRoleIds: string[]): string => {
+	if (settingsRoleIds.length === 0) {
+		return 'No roles have been configured yet.';
+	}
+
+	return settingsRoleIds.map((roleId) => `• <@&${roleId}>`).join('\n');
+};
+
+const buildMusicChannelText = (musicChannelId: string | undefined): string => {
+	if (!musicChannelId) {
+		return 'No music channel has been configured yet.';
+	}
+
+	return `Currently assigned channel: <#${musicChannelId}>`;
+};
+
+const buildMusicServicesText = (
+	services: Record<string, boolean> | undefined,
+	availableServices: Array<[string, ServiceConfig]>,
+): string => {
+	const selectedServices = availableServices
+		.filter(([name]) => services?.[name])
+		.map(([name, service]) => `${service.emoji} ${name}`);
+
+	if (selectedServices.length === 0) {
+		return 'No music services have been configured yet.';
+	}
+
+	return `Currently assigned services:\n${selectedServices.join('\n')}`;
+};
+
+const buildSettingsAccessText = (settingsRoleIds: string[]): string => {
+	if (settingsRoleIds.length === 0) {
+		return 'Only server administrators can customize settings until roles are configured.';
+	}
+
+	return 'Only members with one of the roles above can customize settings.';
+};
+
+const getMemberRoleIds = (
+	member:
+		| { roles: string[] }
+		| { roles: { cache: Collection<string, unknown> } }
+		| null
+		| undefined,
+): string[] => {
+	if (!member) {
+		return [];
+	}
+
+	if (Array.isArray(member.roles)) {
+		return member.roles;
+	}
+
+	return [...member.roles.cache.keys()];
+};
+
+const hasSettingsAccess = (
+	interaction: ChatInputCommandInteraction,
+	settingsRoleIds: string[],
+): boolean => {
+	if (!interaction.guildId) {
+		return false;
+	}
+
+	if (settingsRoleIds.length === 0) {
+		return (
+			interaction.memberPermissions?.has(
+				PermissionsBitField.Flags.Administrator,
+			) ?? false
+		);
+	}
+
+	const memberRoleIds = getMemberRoleIds(
+		interaction.member as
+			| { roles: string[] }
+			| { roles: { cache: Collection<string, unknown> } }
+			| null
+			| undefined,
+	);
+
+	return settingsRoleIds.some((roleId) => memberRoleIds.includes(roleId));
+};
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -27,9 +140,27 @@ module.exports = {
 		const config = JSON.parse(
 			fs.readFileSync(configPath, 'utf8'),
 		) as BotConfig;
+		const settings = loadSettings();
 		const services = Object.entries(config.services ?? {}) as Array<
 			[string, ServiceConfig]
 		>;
+		const settingsRoleIds = interaction.guildId
+			? (settings[interaction.guildId]?.settingsRoleIds ?? [])
+			: [];
+		const musicChannelId = interaction.guildId
+			? settings[interaction.guildId]?.musicChannelId
+			: undefined;
+		const guildServices = interaction.guildId
+			? settings[interaction.guildId]?.services
+			: undefined;
+
+		if (!hasSettingsAccess(interaction, settingsRoleIds)) {
+			await interaction.reply({
+				content: 'You do not have access to change settings here.',
+				flags: MessageFlags.Ephemeral,
+			});
+			return;
+		}
 
 		const servicesText =
 			services.length > 0
@@ -37,6 +168,13 @@ module.exports = {
 						.map(([name, service]) => `${service.emoji} ${name}`)
 						.join('\n')
 				: 'No services have been configured yet.';
+		const musicServicesText = buildMusicServicesText(
+			guildServices,
+			services,
+		);
+		const musicChannelText = buildMusicChannelText(musicChannelId);
+		const settingsRolesText = buildSettingsRolesText(settingsRoleIds);
+		const settingsAccessText = buildSettingsAccessText(settingsRoleIds);
 
 		const embed = new EmbedBuilder()
 			.setColor(0x00ff00)
@@ -47,12 +185,17 @@ module.exports = {
 			.addFields(
 				{
 					name: 'Music Channel',
-					value: 'Set the channel where Rippie will look for music links.',
+					value: `Set the channel where Rippie will look for music links.\n${musicChannelText}`,
 					inline: false,
 				},
 				{
 					name: 'Music Services',
-					value: `These are the services currently available:\n${servicesText}`,
+					value: `These are the services currently available:\n${servicesText}\n\n${musicServicesText}`,
+					inline: false,
+				},
+				{
+					name: 'Settings Roles',
+					value: `These roles can configure settings:\n${settingsRolesText}\n\n${settingsAccessText}`,
 					inline: false,
 				},
 			)
@@ -75,6 +218,12 @@ module.exports = {
 					description:
 						'Pick which music services this community uses.',
 					value: 'music_services',
+				},
+				{
+					label: 'Settings roles',
+					description:
+						'Pick the roles that can change settings in this server.',
+					value: 'settings_roles',
 				},
 			);
 

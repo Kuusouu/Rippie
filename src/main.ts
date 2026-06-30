@@ -10,6 +10,8 @@ import {
 	Events,
 	GatewayIntentBits,
 	MessageFlags,
+	PermissionsBitField,
+	RoleSelectMenuBuilder,
 	StringSelectMenuBuilder,
 } from 'discord.js';
 import 'dotenv/config';
@@ -27,6 +29,7 @@ type BotConfig = {
 type GuildSettings = {
 	musicChannelId?: string;
 	services?: Record<string, boolean>;
+	settingsRoleIds?: string[];
 };
 
 type SettingsStore = Record<string, GuildSettings>;
@@ -92,6 +95,74 @@ const getSelectionKey = (guildId: string | null, userId: string): string =>
 	`${guildId ?? 'dm'}:${userId}`;
 
 const pendingMusicServicesSelections = new Map<string, string[]>();
+const pendingSettingsRoleSelections = new Map<string, string[]>();
+
+const getMemberRoleIds = (
+	member:
+		| { roles: string[] }
+		| { roles: { cache: Collection<string, unknown> } }
+		| null
+		| undefined,
+): string[] => {
+	if (!member) {
+		return [];
+	}
+
+	if (Array.isArray(member.roles)) {
+		return member.roles;
+	}
+
+	return [...member.roles.cache.keys()];
+};
+
+const getSavedSettingsRoles = (guildId: string | null): string[] => {
+	if (!guildId) {
+		return [];
+	}
+
+	return client.settings[guildId]?.settingsRoleIds ?? [];
+};
+
+const hasSettingsAccess = (
+	interaction:
+		| {
+				guildId: string | null;
+				memberPermissions: PermissionsBitField | null;
+				member:
+					| { roles: string[] }
+					| { roles: { cache: Collection<string, unknown> } }
+					| null
+					| undefined;
+		  }
+		| {
+				guildId: string | null;
+				memberPermissions?: PermissionsBitField | null;
+				member?: unknown;
+		  },
+): boolean => {
+	if (!interaction.guildId) {
+		return false;
+	}
+
+	const allowedRoles = getSavedSettingsRoles(interaction.guildId);
+	if (allowedRoles.length === 0) {
+		return (
+			interaction.memberPermissions?.has(
+				PermissionsBitField.Flags.Administrator,
+			) ?? false
+		);
+	}
+
+	const memberRoleIds = getMemberRoleIds(
+		interaction.member as
+			| { roles: string[] }
+			| { roles: { cache: Collection<string, unknown> } }
+			| null
+			| undefined,
+	);
+
+	return allowedRoles.some((roleId) => memberRoleIds.includes(roleId));
+};
 
 const getSavedMusicServices = (guildId: string | null): string[] => {
 	if (!guildId) {
@@ -118,7 +189,7 @@ const buildMusicServicesPayload = (selectedServices: string[]) => {
 		.setColor(0x00ff00)
 		.setTitle('Configure Music Services')
 		.setDescription(
-			'Select the services this community wants, then accept or decline the changes.',
+			'Select the services this community wants, then accept the changes.',
 		)
 		.addFields({
 			name: 'Current selection',
@@ -150,10 +221,46 @@ const buildMusicServicesPayload = (selectedServices: string[]) => {
 			.setCustomId('settings:music_services:accept')
 			.setLabel('Accept')
 			.setStyle(ButtonStyle.Success),
+	);
+
+	return {
+		embeds: [embed],
+		components: [selectRow, actionRow],
+	};
+};
+
+const buildSettingsRolesPayload = (selectedRoles: string[]) => {
+	const selectedSummary =
+		selectedRoles.length > 0
+			? selectedRoles.map((roleId) => `• <@&${roleId}>`).join('\n')
+			: 'No roles selected yet.';
+
+	const embed = new EmbedBuilder()
+		.setColor(0x00ff00)
+		.setTitle('Configure Settings Roles')
+		.setDescription(
+			'Select the roles that can customize settings, then accept the changes.',
+		)
+		.addFields({
+			name: 'Current selection',
+			value: selectedSummary,
+			inline: false,
+		});
+
+	const selectMenu = new RoleSelectMenuBuilder()
+		.setCustomId('settings:settings_roles')
+		.setPlaceholder('Choose the roles allowed to manage settings')
+		.setMinValues(0)
+		.setMaxValues(25);
+
+	const selectRow =
+		new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(selectMenu);
+
+	const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
 		new ButtonBuilder()
-			.setCustomId('settings:music_services:decline')
-			.setLabel('Decline')
-			.setStyle(ButtonStyle.Danger),
+			.setCustomId('settings:settings_roles:accept')
+			.setLabel('Accept')
+			.setStyle(ButtonStyle.Success),
 	);
 
 	return {
@@ -197,6 +304,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
 	if (interaction.isChannelSelectMenu()) {
 		if (interaction.customId !== 'settings:music_channel') return;
 
+		if (!hasSettingsAccess(interaction)) {
+			await interaction.reply({
+				content: 'You do not have access to change settings here.',
+				flags: MessageFlags.Ephemeral,
+			});
+			return;
+		}
+
 		const selectedChannelId = interaction.values[0];
 		if (interaction.guildId) {
 			client.settings[interaction.guildId] ??= {};
@@ -212,8 +327,36 @@ client.on(Events.InteractionCreate, async (interaction) => {
 		return;
 	}
 
+	if (interaction.isRoleSelectMenu()) {
+		if (interaction.customId !== 'settings:settings_roles') return;
+
+		if (!hasSettingsAccess(interaction)) {
+			await interaction.reply({
+				content: 'You do not have access to change settings here.',
+				flags: MessageFlags.Ephemeral,
+			});
+			return;
+		}
+
+		const key = getSelectionKey(interaction.guildId, interaction.user.id);
+		pendingSettingsRoleSelections.set(key, interaction.values);
+
+		await interaction.update({
+			...buildSettingsRolesPayload(interaction.values),
+		});
+		return;
+	}
+
 	if (interaction.isStringSelectMenu()) {
 		if (interaction.customId === 'settings:music_services') {
+			if (!hasSettingsAccess(interaction)) {
+				await interaction.reply({
+					content: 'You do not have access to change settings here.',
+					flags: MessageFlags.Ephemeral,
+				});
+				return;
+			}
+
 			const key = getSelectionKey(
 				interaction.guildId,
 				interaction.user.id,
@@ -227,6 +370,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
 		}
 
 		if (interaction.customId !== 'settings:category') return;
+
+		if (!hasSettingsAccess(interaction)) {
+			await interaction.reply({
+				content: 'You do not have access to change settings here.',
+				flags: MessageFlags.Ephemeral,
+			});
+			return;
+		}
 
 		const selectedChoice = interaction.values[0];
 		if (selectedChoice === 'music_channel') {
@@ -268,47 +419,99 @@ client.on(Events.InteractionCreate, async (interaction) => {
 			return;
 		}
 
-		return;
-	}
+		if (selectedChoice === 'settings_roles') {
+			const key = getSelectionKey(
+				interaction.guildId,
+				interaction.user.id,
+			);
+			const selectedRoles = getSavedSettingsRoles(interaction.guildId);
+			pendingSettingsRoleSelections.set(key, selectedRoles);
 
-	if (interaction.isButton()) {
-		if (!interaction.customId.startsWith('settings:music_services:'))
-			return;
-
-		const key = getSelectionKey(interaction.guildId, interaction.user.id);
-		const selectedServices =
-			pendingMusicServicesSelections.get(key) ??
-			getSavedMusicServices(interaction.guildId);
-
-		if (interaction.customId === 'settings:music_services:decline') {
-			pendingMusicServicesSelections.delete(key);
-			await interaction.update({
-				content: 'Music services configuration cancelled.',
-				embeds: [],
-				components: [],
+			await interaction.reply({
+				...buildSettingsRolesPayload(selectedRoles),
+				flags: MessageFlags.Ephemeral,
 			});
 			return;
 		}
 
-		if (interaction.customId === 'settings:music_services:accept') {
+		return;
+	}
+
+	if (interaction.isButton()) {
+		if (
+			!interaction.customId.startsWith('settings:music_services:') &&
+			!interaction.customId.startsWith('settings:settings_roles:')
+		) {
+			return;
+		}
+
+		if (!hasSettingsAccess(interaction)) {
+			await interaction.reply({
+				content: 'You do not have access to change settings here.',
+				flags: MessageFlags.Ephemeral,
+			});
+			return;
+		}
+
+		if (interaction.customId.startsWith('settings:music_services:')) {
+			const key = getSelectionKey(
+				interaction.guildId,
+				interaction.user.id,
+			);
+			const selectedServices =
+				pendingMusicServicesSelections.get(key) ??
+				getSavedMusicServices(interaction.guildId);
+
+			if (interaction.customId === 'settings:music_services:accept') {
+				if (interaction.guildId) {
+					client.settings[interaction.guildId] ??= {};
+					client.settings[interaction.guildId].services =
+						Object.fromEntries(
+							serviceEntries.map(({ name }) => [
+								name,
+								selectedServices.includes(name),
+							]),
+						);
+					saveSettings();
+				}
+
+				pendingMusicServicesSelections.delete(key);
+				await interaction.update({
+					content: `Music services saved: ${
+						selectedServices.length > 0
+							? selectedServices.join(', ')
+							: 'none selected'
+					}.`,
+					embeds: [],
+					components: [],
+				});
+				return;
+			}
+
+			return;
+		}
+
+		const key = getSelectionKey(interaction.guildId, interaction.user.id);
+		const selectedRoles =
+			pendingSettingsRoleSelections.get(key) ??
+			getSavedSettingsRoles(interaction.guildId);
+
+		if (interaction.customId === 'settings:settings_roles:accept') {
 			if (interaction.guildId) {
 				client.settings[interaction.guildId] ??= {};
-				client.settings[interaction.guildId].services =
-					Object.fromEntries(
-						serviceEntries.map(({ name }) => [
-							name,
-							selectedServices.includes(name),
-						]),
-					);
+				client.settings[interaction.guildId].settingsRoleIds =
+					selectedRoles;
 				saveSettings();
 			}
 
-			pendingMusicServicesSelections.delete(key);
+			pendingSettingsRoleSelections.delete(key);
 			await interaction.update({
-				content: `Music services saved: ${
-					selectedServices.length > 0
-						? selectedServices.join(', ')
-						: 'none selected'
+				content: `Settings roles saved: ${
+					selectedRoles.length > 0
+						? selectedRoles
+								.map((roleId) => `<@&${roleId}>`)
+								.join(', ')
+						: 'admins only'
 				}.`,
 				embeds: [],
 				components: [],
