@@ -8,6 +8,12 @@
 		},
 		"YouTube Music": {
 			"emoji": "<:ytmusic:1520657498208604291>"
+		},
+		"Deezer": {
+			"emoji": "<:deezer:1521457821156245514>"
+		},
+		"Tidal": {
+			"emoji": "<:tidal:1521457810578214982>"
 		}
 	}
 }
