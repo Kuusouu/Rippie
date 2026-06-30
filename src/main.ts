@@ -13,7 +13,7 @@ import {
 	RoleSelectMenuBuilder,
 	StringSelectMenuBuilder,
 } from 'discord.js';
-import 'dotenv/config';
+import { env } from './env';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -409,4 +409,4 @@ client.on(Events.InteractionCreate, async (interaction) => {
 	}
 });
 
-client.login(process.env.TOKEN);
+client.login(env.TOKEN);
