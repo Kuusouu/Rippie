@@ -10,7 +10,6 @@ import {
 	Events,
 	GatewayIntentBits,
 	MessageFlags,
-	PermissionsBitField,
 	RoleSelectMenuBuilder,
 	StringSelectMenuBuilder,
 } from 'discord.js';
@@ -18,151 +17,25 @@ import 'dotenv/config';
 import fs from 'node:fs';
 import path from 'node:path';
 
-type ServiceConfig = {
-	emoji: string;
-};
-
-type BotConfig = {
-	services?: Record<string, ServiceConfig>;
-};
-
-type GuildSettings = {
-	musicChannelId?: string;
-	services?: Record<string, boolean>;
-	settingsRoleIds?: string[];
-};
-
-type SettingsStore = Record<string, GuildSettings>;
+import {
+	getServiceEntries,
+	loadBotConfig,
+	loadSettings,
+	saveSettings,
+} from './config';
+import { getSavedSettingsRoles, hasSettingsAccess } from './permissions';
 
 const client = new Client({
 	intents: [GatewayIntentBits.Guilds],
 });
 
 const commandFileExtensions = ['.js', '.ts'];
-const configPath = path.join(__dirname, '../config.json');
-const settingsPath = path.join(__dirname, '../settings.json');
-
-const loadBotConfig = (): BotConfig => {
-	if (!fs.existsSync(configPath)) {
-		return {};
-	}
-
-	try {
-		return JSON.parse(fs.readFileSync(configPath, 'utf8')) as BotConfig;
-	} catch (error) {
-		console.error(
-			'Failed to load config.json, continuing without services.',
-			error,
-		);
-		return {};
-	}
-};
-
-const botConfig = loadBotConfig();
-const serviceEntries = Object.entries(botConfig.services ?? {}).map(
-	([name, service]) => ({
-		name,
-		emoji: service.emoji,
-	}),
-);
-
-const loadSettings = (): SettingsStore => {
-	if (!fs.existsSync(settingsPath)) {
-		return {};
-	}
-
-	try {
-		return JSON.parse(
-			fs.readFileSync(settingsPath, 'utf8'),
-		) as SettingsStore;
-	} catch (error) {
-		console.error(
-			'Failed to load settings.json, starting with an empty store.',
-			error,
-		);
-		return {};
-	}
-};
-
-const saveSettings = (): void => {
-	fs.writeFileSync(
-		settingsPath,
-		`${JSON.stringify(client.settings, null, 2)}\n`,
-	);
-};
 
 const getSelectionKey = (guildId: string | null, userId: string): string =>
 	`${guildId ?? 'dm'}:${userId}`;
 
 const pendingMusicServicesSelections = new Map<string, string[]>();
 const pendingSettingsRoleSelections = new Map<string, string[]>();
-
-const getMemberRoleIds = (
-	member:
-		| { roles: string[] }
-		| { roles: { cache: Collection<string, unknown> } }
-		| null
-		| undefined,
-): string[] => {
-	if (!member) {
-		return [];
-	}
-
-	if (Array.isArray(member.roles)) {
-		return member.roles;
-	}
-
-	return [...member.roles.cache.keys()];
-};
-
-const getSavedSettingsRoles = (guildId: string | null): string[] => {
-	if (!guildId) {
-		return [];
-	}
-
-	return client.settings[guildId]?.settingsRoleIds ?? [];
-};
-
-const hasSettingsAccess = (
-	interaction:
-		| {
-				guildId: string | null;
-				memberPermissions: PermissionsBitField | null;
-				member:
-					| { roles: string[] }
-					| { roles: { cache: Collection<string, unknown> } }
-					| null
-					| undefined;
-		  }
-		| {
-				guildId: string | null;
-				memberPermissions?: PermissionsBitField | null;
-				member?: unknown;
-		  },
-): boolean => {
-	if (!interaction.guildId) {
-		return false;
-	}
-
-	const allowedRoles = getSavedSettingsRoles(interaction.guildId);
-	if (allowedRoles.length === 0) {
-		return (
-			interaction.memberPermissions?.has(
-				PermissionsBitField.Flags.Administrator,
-			) ?? false
-		);
-	}
-
-	const memberRoleIds = getMemberRoleIds(
-		interaction.member as
-			| { roles: string[] }
-			| { roles: { cache: Collection<string, unknown> } }
-			| null
-			| undefined,
-	);
-
-	return allowedRoles.some((roleId) => memberRoleIds.includes(roleId));
-};
 
 const getSavedMusicServices = (guildId: string | null): string[] => {
 	if (!guildId) {
@@ -174,7 +47,7 @@ const getSavedMusicServices = (guildId: string | null): string[] => {
 		return [];
 	}
 
-	return serviceEntries
+	return getServiceEntries(client.config)
 		.filter(({ name }) => guildSettings.services?.[name])
 		.map(({ name }) => name);
 };
@@ -196,6 +69,8 @@ const buildMusicServicesPayload = (selectedServices: string[]) => {
 			value: selectedSummary,
 			inline: false,
 		});
+
+	const serviceEntries = getServiceEntries(client.config);
 
 	const selectMenu = new StringSelectMenuBuilder()
 		.setCustomId('settings:music_services')
@@ -275,6 +150,7 @@ const buildSettingsRolesPayload = (selectedRoles: string[]) => {
 
 client.commands = new Collection();
 client.settings = loadSettings();
+client.config = loadBotConfig();
 
 client.once(Events.ClientReady, (readyClient: Client<true>) => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
@@ -309,7 +185,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
 		'customId' in interaction &&
 		interaction.customId.startsWith('settings:')
 	) {
-		if (!hasSettingsAccess(interaction)) {
+		if (
+			!hasSettingsAccess(
+				interaction,
+				getSavedSettingsRoles(interaction.guildId, client.settings),
+			)
+		) {
 			await interaction.reply({
 				content: 'You do not have access to change settings here.',
 				flags: MessageFlags.Ephemeral,
@@ -326,7 +207,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 			client.settings[interaction.guildId] ??= {};
 			client.settings[interaction.guildId].musicChannelId =
 				selectedChannelId;
-			saveSettings();
+			saveSettings(client);
 		}
 
 		await interaction.reply({
@@ -409,7 +290,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 				interaction.guildId,
 				interaction.user.id,
 			);
-			const selectedRoles = getSavedSettingsRoles(interaction.guildId);
+			const selectedRoles = getSavedSettingsRoles(
+				interaction.guildId,
+				client.settings,
+			);
 			pendingSettingsRoleSelections.set(key, selectedRoles);
 
 			await interaction.reply({
@@ -444,12 +328,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
 					client.settings[interaction.guildId] ??= {};
 					client.settings[interaction.guildId].services =
 						Object.fromEntries(
-							serviceEntries.map(({ name }) => [
+							getServiceEntries(client.config).map(({ name }) => [
 								name,
 								selectedServices.includes(name),
 							]),
 						);
-					saveSettings();
+					saveSettings(client);
 				}
 
 				pendingMusicServicesSelections.delete(key);
@@ -471,14 +355,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
 		const key = getSelectionKey(interaction.guildId, interaction.user.id);
 		const selectedRoles =
 			pendingSettingsRoleSelections.get(key) ??
-			getSavedSettingsRoles(interaction.guildId);
+			getSavedSettingsRoles(interaction.guildId, client.settings);
 
 		if (interaction.customId === 'settings:settings_roles:accept') {
 			if (interaction.guildId) {
 				client.settings[interaction.guildId] ??= {};
 				client.settings[interaction.guildId].settingsRoleIds =
 					selectedRoles;
-				saveSettings();
+				saveSettings(client);
 			}
 
 			pendingSettingsRoleSelections.delete(key);

@@ -1,52 +1,13 @@
 import {
 	ActionRowBuilder,
 	ChatInputCommandInteraction,
-	Collection,
 	EmbedBuilder,
 	MessageFlags,
-	PermissionsBitField,
 	SlashCommandBuilder,
 	StringSelectMenuBuilder,
 } from 'discord.js';
-import fs from 'node:fs';
-import path from 'node:path';
-
-type ServiceConfig = {
-	emoji: string;
-};
-
-type BotConfig = {
-	services?: Record<string, ServiceConfig>;
-};
-
-type GuildSettings = {
-	musicChannelId?: string;
-	services?: Record<string, boolean>;
-	settingsRoleIds?: string[];
-};
-
-type SettingsStore = Record<string, GuildSettings>;
-
-const configPath = path.join(__dirname, '../../../config.json');
-const settingsPath = path.join(__dirname, '../../../settings.json');
-
-const loadSettings = (): SettingsStore => {
-	if (!fs.existsSync(settingsPath)) {
-		return {};
-	}
-
-	try {
-		return JSON.parse(
-			fs.readFileSync(settingsPath, 'utf8'),
-		) as SettingsStore;
-	} catch (error) {
-		console.error(
-			'Failed to load settings.json, continuing without roles.',
-			error,
-		);
-		return {};
-	}
-};
+import { getServiceEntries } from '../../config';
+import { getSavedSettingsRoles, hasSettingsAccess } from '../../permissions';
 
 const buildSettingsRolesText = (settingsRoleIds: string[]): string => {
 	if (settingsRoleIds.length === 0) {
@@ -66,11 +27,11 @@ const buildMusicChannelText = (musicChannelId: string | undefined): string => {
 
 const buildMusicServicesText = (
 	services: Record<string, boolean> | undefined,
-	availableServices: Array<[string, ServiceConfig]>,
+	availableServices: Array<{ name: string; emoji: string }>,
 ): string => {
 	const selectedServices = availableServices
-		.filter(([name]) => services?.[name])
-		.map(([name, service]) => `${service.emoji} ${name}`);
+		.filter(({ name }) => services?.[name])
+		.map(({ name, emoji }) => `${emoji} ${name}`);
 
 	if (selectedServices.length === 0) {
 		return 'No music services have been configured yet.';
@@ -87,65 +48,16 @@ const buildSettingsAccessText = (settingsRoleIds: string[]): string => {
 	return 'Only members with one of the roles above can customize settings.';
 };
 
-const getMemberRoleIds = (
-	member:
-		| { roles: string[] }
-		| { roles: { cache: Collection<string, unknown> } }
-		| null
-		| undefined,
-): string[] => {
-	if (!member) {
-		return [];
-	}
-
-	if (Array.isArray(member.roles)) {
-		return member.roles;
-	}
-
-	return [...member.roles.cache.keys()];
-};
-
-const hasSettingsAccess = (
-	interaction: ChatInputCommandInteraction,
-	settingsRoleIds: string[],
-): boolean => {
-	if (!interaction.guildId) {
-		return false;
-	}
-
-	if (settingsRoleIds.length === 0) {
-		return (
-			interaction.memberPermissions?.has(
-				PermissionsBitField.Flags.Administrator,
-			) ?? false
-		);
-	}
-
-	const memberRoleIds = getMemberRoleIds(
-		interaction.member as
-			| { roles: string[] }
-			| { roles: { cache: Collection<string, unknown> } }
-			| null
-			| undefined,
-	);
-
-	return settingsRoleIds.some((roleId) => memberRoleIds.includes(roleId));
-};
-
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('settings')
 		.setDescription('Configure the bot in your server'),
 	async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-		const config = JSON.parse(
-			fs.readFileSync(configPath, 'utf8'),
-		) as BotConfig;
-		const settings = loadSettings();
-		const services = Object.entries(config.services ?? {}) as Array<
-			[string, ServiceConfig]
-		>;
+		const { config, settings } = interaction.client;
+
+		const services = getServiceEntries(config);
 		const settingsRoleIds = interaction.guildId
-			? (settings[interaction.guildId]?.settingsRoleIds ?? [])
+			? getSavedSettingsRoles(interaction.guildId, settings)
 			: [];
 		const musicChannelId = interaction.guildId
 			? settings[interaction.guildId]?.musicChannelId
@@ -165,7 +77,7 @@ module.exports = {
 		const servicesText =
 			services.length > 0
 				? services
-						.map(([name, service]) => `${service.emoji} ${name}`)
+						.map(({ name, emoji }) => `${emoji} ${name}`)
 						.join('\n')
 				: 'No services have been configured yet.';
 		const musicServicesText = buildMusicServicesText(
