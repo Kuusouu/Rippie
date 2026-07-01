@@ -1,3 +1,5 @@
+import { TrackInfo } from '../types';
+
 type DeezerTrack = {
 	id: number;
 	title: string;
@@ -19,12 +21,6 @@ export type DeezerTrackLookup = {
 	artists: string[];
 	isrc: string;
 	link: string;
-};
-
-export type TrackInfo = {
-	name: string;
-	artists: string[];
-	isrc: string | null;
 };
 
 // Direct track links embed the numeric ID after /track/ (e.g., https://www.deezer.com/track/3135556)
@@ -83,6 +79,7 @@ export const fetchDeezerTrackInfo = async (
 		name: track.title,
 		artists: [track.artist.name],
 		isrc: track.isrc ?? null,
+		link: track.link ?? null,
 	};
 };
 

@@ -1,4 +1,5 @@
 import { env } from '../env';
+import { TrackInfo } from '../types';
 
 type SpotifyTokenResponse = {
 	access_token: string;
@@ -28,11 +29,6 @@ export type SpotifyTrackLookup = {
 	link: string;
 };
 
-export type TrackInfo = {
-	name: string;
-	artists: string[];
-	isrc: string | null;
-};
 
 // Spotify links always contain the track ID at the end before the query params (e.g., https://open.spotify.com/track/<id>?...)
 const TRACK_ID_PATTERN = /open\.spotify\.com\/track\/([a-zA-Z0-9]+)/;
@@ -102,6 +98,7 @@ export const fetchSpotifyTrackInfo = async (
 		name: track.name,
 		artists: track.artists.map((a) => a.name),
 		isrc: track.external_ids.isrc ?? null,
+		link: `https://open.spotify.com/track/${track.id}`,
 	};
 };
 

@@ -1,5 +1,5 @@
 import { distance } from 'fastest-levenshtein';
-import { DeezerTrackLookup } from './deezer';
+import { TrackInfo } from '../types';
 
 // --- Types ---
 
@@ -12,10 +12,6 @@ interface ITunesResult {
 interface ITunesLookupResponse {
 	results: ITunesResult[];
 }
-
-export type AppleMusicTrackLookup = {
-	link: string;
-};
 
 // --- Shared Utilities ---
 
@@ -76,7 +72,7 @@ const fetchITunesRecords = async (ids: string): Promise<ITunesResult[]> => {
 // Picks the best Deezer result for a given target signature using Levenshtein distance.
 const pickBestDeezerTrack = async (
 	targetSignature: string,
-): Promise<DeezerTrackLookup | null> => {
+): Promise<TrackInfo | null> => {
 	const deezerUrl = `https://api.deezer.com/search?q=${encodeURIComponent(targetSignature)}`;
 	const res = await fetch(deezerUrl);
 	const json = await res.json();
@@ -102,11 +98,10 @@ const pickBestDeezerTrack = async (
 	if (!bestTrack) return null;
 
 	return {
-		id: bestTrack.id,
 		name: bestTrack.title,
 		artists: [bestTrack.artist.name],
-		isrc: bestTrack.isrc,
-		link: bestTrack.link,
+		isrc: bestTrack.isrc ?? null,
+		link: bestTrack.link ?? null,
 	};
 };
 
@@ -180,7 +175,7 @@ export const lookupAppleTrackByInfo = async (
 // Returns null if any step fails to produce a confident match.
 export const lookupAppleTrackByLink = async (
 	url: string,
-): Promise<DeezerTrackLookup | null> => {
+): Promise<TrackInfo | null> => {
 	const appleId = extractAppleId(url);
 	if (!appleId) return null;
 

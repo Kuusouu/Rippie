@@ -13,3 +13,11 @@ export type GuildSettings = {
 };
 
 export type SettingsStore = Record<string, GuildSettings>;
+
+// Normalized track information shared across all platform integrations.
+export type TrackInfo = {
+	name: string;
+	artists: string[];
+	isrc: string | null;
+	link: string | null;
+};
