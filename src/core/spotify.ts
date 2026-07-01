@@ -6,11 +6,26 @@ type SpotifyTokenResponse = {
 };
 
 type SpotifyTrack = {
+	id: string;
 	name: string;
 	artists: { name: string }[];
 	external_ids: {
 		isrc?: string;
 	};
+};
+
+type SpotifySearchResponse = {
+	tracks: {
+		items: SpotifyTrack[];
+	};
+};
+
+export type SpotifyTrackLookup = {
+	id: string;
+	name: string;
+	artists: string[];
+	isrc: string;
+	link: string;
 };
 
 export type TrackInfo = {
@@ -87,5 +102,44 @@ export const fetchSpotifyTrackInfo = async (
 		name: track.name,
 		artists: track.artists.map((a) => a.name),
 		isrc: track.external_ids.isrc ?? null,
+	};
+};
+
+export const lookupSpotifyTrackByIsrc = async (
+	isrc: string,
+): Promise<SpotifyTrackLookup | null> => {
+	const token = await getAccessToken();
+
+	const url = new URL('https://api.spotify.com/v1/search');
+	url.searchParams.set('q', `isrc:${isrc}`);
+	url.searchParams.set('type', 'track');
+	url.searchParams.set('limit', '1');
+
+	const response = await fetch(url.toString(), {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (!response.ok) {
+		throw new Error(
+			`Spotify ISRC search failed: ${response.status} ${response.statusText}`,
+		);
+	}
+
+	const data = (await response.json()) as SpotifySearchResponse;
+
+	if (!data.tracks.items.length) {
+		return null;
+	}
+
+	const track = data.tracks.items[0];
+
+	return {
+		id: track.id,
+		name: track.name,
+		artists: track.artists.map((a) => a.name),
+		isrc: track.external_ids.isrc ?? isrc, // fallback to provided isrc if missing from response
+		link: `https://open.spotify.com/track/${track.id}`,
 	};
 };
