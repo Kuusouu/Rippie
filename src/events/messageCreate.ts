@@ -3,8 +3,8 @@ import { generatePlatformButtons } from '../buttons';
 import { extractDeezerTrackId, fetchDeezerTrackInfo } from '../core/deezer';
 import { detectMusicPlatform, Platform } from '../core/music';
 import { resolveLinksFromIsrc } from '../core/resolver';
-import type { TrackInfo } from '../core/spotify';
 import { extractSpotifyTrackId, fetchSpotifyTrackInfo } from '../core/spotify';
+import type { TrackInfo } from '../types.ts';
 
 // Resolves a detected platform link to a TrackInfo object.
 // Returns null if the track ID cannot be extracted or the platform isn't handled yet.
