@@ -2,6 +2,7 @@ import { env } from '../env';
 
 type SpotifyTokenResponse = {
 	access_token: string;
+	expires_in: number;
 };
 
 type SpotifyTrack = {
@@ -26,7 +27,14 @@ export const extractSpotifyTrackId = (url: string): string | null => {
 	return match?.[1] ?? null;
 };
 
+let cachedToken: string | null = null;
+let tokenExpiresAt: number = 0;
+
 const getAccessToken = async (): Promise<string> => {
+	if (cachedToken && Date.now() < tokenExpiresAt) {
+		return cachedToken;
+	}
+
 	const credentials = Buffer.from(
 		`${env.SPOTIFY_CLIENT_ID}:${env.SPOTIFY_CLIENT_SECRET}`,
 	).toString('base64');
@@ -47,7 +55,12 @@ const getAccessToken = async (): Promise<string> => {
 	}
 
 	const data = (await response.json()) as SpotifyTokenResponse;
-	return data.access_token;
+
+	cachedToken = data.access_token;
+	console.log(data.expires_in);
+	tokenExpiresAt = Date.now() + data.expires_in * 1000 - 60_000; // 60s buffer so it doesn't expire mid request
+
+	return cachedToken;
 };
 
 export const fetchSpotifyTrackInfo = async (
