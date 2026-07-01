@@ -139,8 +139,20 @@ async function getBestTrack(artist: string, song: string): Promise<void> {
 			const rawItunesSignature = `${data.artistName} - ${data.collectionName}`;
 			const cleanItunesSignature = normalizeText(rawItunesSignature);
 
+			// Score the iTunes fields
+			const itunesScore = distance(targetSignature, cleanItunesSignature);
+
+			// Extract and score the URL slug
+			let urlScore = 0;
+			const slugMatch = link.match(/\/album\/([^\/]+)\/\d+/);
+			if (slugMatch) {
+				const rawSlug = slugMatch[1];
+				const cleanedSlug = normalizeText(rawSlug);
+				urlScore = distance(normalizeText(song), cleanedSlug);
+			}
+
 			// Score the combined fields directly
-			const matchScore = distance(targetSignature, cleanItunesSignature);
+			const matchScore = itunesScore + urlScore;
 
 			console.log(
 				` -> Track ID: ${data.trackId} | Combined Score: ${matchScore}`,
