@@ -1,6 +1,29 @@
 import { Client, Events } from 'discord.js';
 import { detectMusicPlatform, Platform } from '../core/music';
 import { extractSpotifyTrackId, fetchSpotifyTrackInfo } from '../core/spotify';
+import { extractDeezerTrackId, fetchDeezerTrackInfo } from '../core/deezer';
+import type { TrackInfo } from '../core/spotify';
+
+// Resolves a detected platform link to a TrackInfo object.
+// Returns null if the track ID cannot be extracted or the platform isn't handled yet.
+const resolveTrackInfo = async (
+	platform: Platform,
+	content: string,
+): Promise<TrackInfo | null> => {
+	if (platform === Platform.Spotify) {
+		const trackId = extractSpotifyTrackId(content);
+		if (!trackId) return null;
+		return fetchSpotifyTrackInfo(trackId);
+	}
+
+	if (platform === Platform.Deezer) {
+		const trackId = await extractDeezerTrackId(content);
+		if (!trackId) return null;
+		return fetchDeezerTrackInfo(trackId);
+	}
+
+	return null;
+};
 
 export const registerMessageHandler = (client: Client): void => {
 	client.on(Events.MessageCreate, async (message) => {
@@ -19,32 +42,25 @@ export const registerMessageHandler = (client: Client): void => {
 		const guildHasPlatformEnabled = guildSettings.services[platform];
 		if (!guildHasPlatformEnabled) return;
 
-		if (platform === Platform.Spotify) {
-			const trackId = extractSpotifyTrackId(message.content);
-			if (!trackId) {
+		try {
+			const track = await resolveTrackInfo(platform, message.content);
+			if (!track) {
 				await message.reply(
-					'Spotify link detected, but could not extract track ID.',
+					`${platform} link detected, but could not resolve track info.`,
 				);
 				return;
 			}
 
-			try {
-				const track = await fetchSpotifyTrackInfo(trackId);
-				const artists = track.artists.join(', ');
-				const isrc = track.isrc ?? 'N/A';
-				await message.reply(
-					`**${track.name}** — ${artists}\nISRC: \`${isrc}\``,
-				);
-			} catch (error) {
-				console.error('Failed to fetch Spotify track info:', error);
-				await message.reply(
-					'Spotify link detected, but failed to fetch track info.',
-				);
-			}
-			return;
+			const artists = track.artists.join(', ');
+			const isrc = track.isrc ?? 'N/A';
+			await message.reply(
+				`**${track.name}** — ${artists}\nISRC: \`${isrc}\``,
+			);
+		} catch (error) {
+			console.error(`Failed to fetch ${platform} track info:`, error);
+			await message.reply(
+				`${platform} link detected, but failed to fetch track info.`,
+			);
 		}
-
-		// Fallback for other platforms (to be expanded later)
-		await message.reply(`${platform} link detected.`);
 	});
 };
