@@ -16,7 +16,7 @@ const main = async () => {
 	const url = process.argv[2];
 	if (!url) {
 		console.error(
-			'Usage: npx tsx src/experiments/deezer-isrc.ts <deezer-track-url>',
+			'Usage: npx ts-node src/experiments/deezer-isrc.ts <deezer-track-url>',
 		);
 		process.exit(1);
 	}

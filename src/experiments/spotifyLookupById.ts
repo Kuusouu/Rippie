@@ -13,7 +13,7 @@ const main = async () => {
 	const url = process.argv[2];
 	if (!url) {
 		console.error(
-			'Usage: npx tsx src/experiments/spotify-isrc.ts <spotify-track-url>',
+			'Usage: npx ts-node src/experiments/spotify-isrc.ts <spotify-track-url>',
 		);
 		process.exit(1);
 	}

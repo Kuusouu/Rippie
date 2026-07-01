@@ -15,7 +15,7 @@ const main = async () => {
 	const isrc = process.argv[2];
 	if (!isrc) {
 		console.error(
-			'Usage: npx tsx src/experiments/deezer-isrc-lookup.ts <isrc>',
+			'Usage: npx ts-node src/experiments/deezer-isrc-lookup.ts <isrc>',
 		);
 		process.exit(1);
 	}

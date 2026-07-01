@@ -12,7 +12,7 @@ const main = async () => {
 	const isrc = process.argv[2];
 	if (!isrc) {
 		console.error(
-			'Usage: npx tsx src/experiments/spotify-isrc-lookup.ts <isrc>',
+			'Usage: npx ts-node src/experiments/spotify-isrc-lookup.ts <isrc>',
 		);
 		process.exit(1);
 	}
