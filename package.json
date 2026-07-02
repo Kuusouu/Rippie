@@ -5,11 +5,11 @@
 	"main": "src/main.ts",
 	"scripts": {
 		"dev": "bun --watch src/main.ts",
-		"typecheck": "tsc --noEmit",
+		"build": "tsc --noEmit",
 		"start": "bun src/main.ts",
 		"sync": "bun src/deploy-commands.js",
-		"format": "bun run prettier --write .",
-		"format-check": "bun run prettier --check ."
+		"format": "bunx prettier --write .",
+		"format-check": "bunx prettier --check ."
 	},
 	"repository": {
 		"type": "git",
