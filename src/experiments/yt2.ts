@@ -47,7 +47,12 @@ const normalizeText = (text: string): string => {
 // Levenshtein distance. Returns ISRC + Deezer link, or null if no match.
 const pickBestDeezerTrack = async (
 	targetSignature: string,
-): Promise<{ isrc: string; link: string } | null> => {
+): Promise<{
+	isrc: string;
+	link: string;
+	name: string;
+	artist: string;
+} | null> => {
 	const res = await fetch(
 		`https://api.deezer.com/search?q=${encodeURIComponent(targetSignature)}`,
 	);
@@ -76,70 +81,74 @@ const pickBestDeezerTrack = async (
 	return {
 		isrc: bestTrack.isrc,
 		link: bestTrack.link,
+		name: bestTrack.title,
+		artist: bestTrack.artist.name,
 	};
+};
+
+const extractYoutubeId = (url: string): string | null => {
+	try {
+		const urlObj = new URL(url);
+		if (urlObj.searchParams.has('v')) {
+			return urlObj.searchParams.get('v');
+		}
+		if (urlObj.hostname === 'youtu.be') {
+			return urlObj.pathname.slice(1);
+		}
+	} catch (e) {
+		// fallback to regex if URL parsing fails
+	}
+	const match = url.match(/(?:v=|youtu\.be\/)([\w-]+)/);
+	return match?.[1] ?? null;
 };
 
 // --- Main ---
 
 const main = async () => {
-	const artistInput: string | undefined = process.argv[2];
-	const songInput: string | undefined = process.argv[3];
+	const linkInput: string | undefined = process.argv[2];
 
-	if (!artistInput || !songInput) {
-		console.log('\x1b[31m%s\x1b[0m', 'Error: Missing arguments.');
+	if (!linkInput) {
+		console.log('\x1b[31m%s\x1b[0m', 'Error: Missing argument.');
 		console.log(
-			'Usage: bun run src/experiments/yt.ts "Artist Name" "Song Title"',
+			'Usage: bun run src/experiments/yt2.ts "https://music.youtube.com/watch?v=..."',
 		);
 		process.exit(1);
 	}
+
+	const videoId = extractYoutubeId(linkInput);
+	if (!videoId) {
+		console.error(`Could not extract a video ID from: ${linkInput}`);
+		process.exit(1);
+	}
+
+	console.log(`Video ID: ${videoId}`);
 
 	// Initialize the YT Music client
 	const ytmusic = new YTMusic();
 	await ytmusic.initialize();
 
-	const results = await ytmusic.searchSongs(`${artistInput} ${songInput}`);
+	console.log('Fetching track metadata from YT Music...');
+	// Casting to any to handle slightly varying artist properties in SongFull
+	const songInfo = (await ytmusic.getSong(videoId)) as any;
 
-	if (results.length === 0) {
-		console.log('No song results found on YouTube Music.');
-		process.exit(1);
-	}
+	const artistName =
+		Array.isArray(songInfo.artists) && songInfo.artists.length > 0
+			? songInfo.artists[0].name
+			: songInfo.artist?.name || songInfo.author || 'Unknown';
 
-	// Score each candidate by Levenshtein distance against our target signature
-	const targetSignature = normalizeText(`${artistInput} - ${songInput}`);
-
-	let bestCandidate: (typeof results)[number] | null = null;
-	let lowestScore = Infinity;
-
-	for (const candidate of results) {
-		const candidateSignature = normalizeText(
-			`${candidate.artist.name} - ${candidate.name}`,
-		);
-		const score = distance(targetSignature, candidateSignature);
-		if (score < lowestScore) {
-			lowestScore = score;
-			bestCandidate = candidate;
-		}
-	}
-
-	if (!bestCandidate) {
-		console.log('Could not confidently select a YouTube Music candidate.');
-		process.exit(1);
-	}
-
-	const ytLink = `https://music.youtube.com/watch?v=${bestCandidate.videoId}`;
-
-	console.log('--- BEST YT MUSIC MATCH ---');
-	console.log(`Name:   ${bestCandidate.name}`);
-	console.log(`Artist: ${bestCandidate.artist.name}`);
-	console.log(`Link:   ${ytLink}`);
+	console.log('\n--- YT MUSIC MATCH ---');
+	console.log(`Name:   ${songInfo.name}`);
+	console.log(`Artist: ${artistName}`);
 
 	// Now cross-reference with Deezer to get the ISRC and canonical Deezer link
 	console.log('\n--- DEEZER CROSS-REFERENCE ---');
 	const deezer = await pickBestDeezerTrack(
-		normalizeText(`${bestCandidate.artist.name} - ${bestCandidate.name}`),
+		normalizeText(`${artistName} - ${songInfo.name}`),
 	);
 
 	if (deezer) {
+		console.log(`Title:       ${deezer.name}`);
+		console.log(`Artist:      ${deezer.artist}`);
 		console.log(`ISRC:        ${deezer.isrc}`);
 		console.log(`Deezer Link: ${deezer.link}`);
 	} else {
