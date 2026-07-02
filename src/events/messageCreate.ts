@@ -3,7 +3,7 @@ import { generatePlatformButtons } from '../buttons';
 import { lookupAppleTrackByLink } from '../core/appleMusic';
 import { extractDeezerTrackId, fetchDeezerTrackInfo } from '../core/deezer';
 import { detectMusicPlatform, Platform } from '../core/music';
-import { resolveLinksFromIsrc } from '../core/resolver';
+import { resolveLinksFromTrack } from '../core/resolver';
 import { extractSpotifyTrackId, fetchSpotifyTrackInfo } from '../core/spotify';
 import { lookupYtMusicTrackByLink } from '../core/ytMusic';
 import type { TrackInfo } from '../types.ts';
@@ -76,8 +76,7 @@ export const registerMessageHandler = (client: Client): void => {
 				.filter(([p, enabled]) => enabled && p !== platform)
 				.map(([p]) => p as Platform);
 
-			const resolvedLinks = await resolveLinksFromIsrc(
-				track.isrc,
+			const resolvedLinks = await resolveLinksFromTrack(
 				enabledPlatforms,
 				track,
 			);
