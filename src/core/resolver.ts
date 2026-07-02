@@ -3,6 +3,7 @@ import { lookupAppleTrackByInfo } from './appleMusic';
 import { lookupDeezerTrackByIsrc } from './deezer';
 import { Platform } from './music';
 import { lookupSpotifyTrackByIsrc } from './spotify';
+import { lookupYtMusicTrackByInfo } from './ytMusic';
 
 // A map of Platform -> canonical URL for a given track.
 export type ResolvedLinks = Map<Platform, string>;
@@ -33,6 +34,12 @@ export const resolveLinksFromIsrc = async (
 			const song = track.name;
 			if (!artist || !song) return null;
 			return lookupAppleTrackByInfo(artist, song);
+		},
+		[Platform.YouTubeMusic]: async () => {
+			const artist = track.artists[0];
+			const song = track.name;
+			if (!artist || !song) return null;
+			return lookupYtMusicTrackByInfo(artist, song);
 		},
 	};
 
