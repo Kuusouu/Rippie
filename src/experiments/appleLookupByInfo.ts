@@ -7,7 +7,7 @@ const main = async () => {
 	if (!artistInput || !songInput) {
 		console.log('\x1b[31m%s\x1b[0m', 'Error: Missing arguments.');
 		console.log(
-			'Usage: npx ts-node src/experiments/appleLookupByInfo.ts "Artist Name" "Song Title"',
+			'Usage: bun run src/experiments/appleLookupByInfo.ts "Artist Name" "Song Title"',
 		);
 		process.exit(1);
 	}
