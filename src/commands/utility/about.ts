@@ -12,7 +12,7 @@ const githubProject = 'https://github.com/Kuusouu/Rippie';
 const supportUrl = 'https://discord.gg/';
 const aboutThumbnailUrl = 'https://placehold.co/512x512/png?text=Rippie';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('about')
 		.setDescription("View what Rippie's all about!"),

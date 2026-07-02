@@ -5,7 +5,7 @@ import {
 	SlashCommandBuilder,
 } from 'discord.js';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('ping')
 		.setDescription(

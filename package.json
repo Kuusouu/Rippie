@@ -4,11 +4,10 @@
 	"description": "A discord bot built by a dreamer.",
 	"main": "src/main.ts",
 	"scripts": {
-		"dev": "tsx src/main.ts",
-		"build": "tsc",
-		"start": "node dist/main.js",
-		"bstart": "tsc && node dist/main.js",
-		"sync": "npx tsx src/deploy-commands.js"
+		"dev": "bun --watch src/main.ts",
+		"typecheck": "tsc --noEmit",
+		"start": "bun src/main.ts",
+		"sync": "bun src/deploy-commands.js"
 	},
 	"repository": {
 		"type": "git",
@@ -29,10 +28,10 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
+		"@types/bun": "^1.3.14",
 		"@types/node": "^26.0.1",
 		"eslint": "^10.5.0",
 		"prettier": "^3.8.4",
-		"tsx": "^4.22.4",
 		"typescript": "^6.0.3"
 	}
 }
