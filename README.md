@@ -27,7 +27,7 @@ Platform buttons are configurable per server, so you only see the ones that matt
 | Spotify       | ![Available](https://img.shields.io/badge/AVAILABLE-2ea043?style=flat-square&logo=spotify&logoColor=white)          |
 | Apple Music   | ![Available](https://img.shields.io/badge/AVAILABLE-2ea043?style=flat-square&logo=applemusic&logoColor=white)       |
 | Deezer        | ![Available](https://img.shields.io/badge/AVAILABLE-2ea043?style=flat-square&logo=deezer&logoColor=white)           |
-| YouTube Music | ![Researching](https://img.shields.io/badge/RESEARCHING-bf8700?style=flat-square&logo=youtubemusic&logoColor=white) |
+| YouTube Music | ![In Progress](https://img.shields.io/badge/IN_PROGRESS-0ea5e9?style=flat-square&logo=youtubemusic&logoColor=white) |
 | Tidal         | ![Researching](https://img.shields.io/badge/RESEARCHING-bf8700?style=flat-square&logo=tidal&logoColor=white)        |
 | Amazon Music  | ![Not Available](https://img.shields.io/badge/NOT_AVAILABLE-6e7681?style=flat-square)                               |
 | Qobuz         | ![Not Available](https://img.shields.io/badge/NOT_AVAILABLE-6e7681?style=flat-square)                               |
