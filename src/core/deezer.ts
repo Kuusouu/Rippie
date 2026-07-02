@@ -41,7 +41,7 @@ export const extractDeezerTrackId = async (
 	// Try the direct format first
 	const directMatch = url.match(DIRECT_TRACK_ID_PATTERN);
 	if (directMatch) {
-		return directMatch[1];
+		return directMatch[1] ?? null;
 	}
 
 	// For short links, follow the redirect and extract the ID from the resolved URL

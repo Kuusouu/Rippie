@@ -135,6 +135,10 @@ export const lookupSpotifyTrackByIsrc = async (
 
 	const track = data.tracks.items[0];
 
+	if (!track) {
+		return null;
+	}
+
 	return {
 		id: track.id,
 		name: track.name,
