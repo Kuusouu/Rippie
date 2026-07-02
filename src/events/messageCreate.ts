@@ -1,5 +1,6 @@
 import { Client, Events } from 'discord.js';
 import { generatePlatformButtons } from '../buttons';
+import { lookupAppleTrackByLink } from '../core/appleMusic';
 import { extractDeezerTrackId, fetchDeezerTrackInfo } from '../core/deezer';
 import { detectMusicPlatform, Platform } from '../core/music';
 import { resolveLinksFromIsrc } from '../core/resolver';
@@ -22,6 +23,12 @@ const resolveTrackInfo = async (
 		const trackId = await extractDeezerTrackId(content);
 		if (!trackId) return null;
 		return fetchDeezerTrackInfo(trackId);
+	}
+
+	if (platform === Platform.AppleMusic) {
+		// lookupAppleTrackByLink uses Deezer internally as a metadata backbone,
+		// so it resolves ISRC + link regardless of whether Deezer is guild-enabled.
+		return lookupAppleTrackByLink(content);
 	}
 
 	return null;
@@ -69,6 +76,7 @@ export const registerMessageHandler = (client: Client): void => {
 			const resolvedLinks = await resolveLinksFromIsrc(
 				track.isrc,
 				enabledPlatforms,
+				track,
 			);
 
 			// Step 3: Build platform buttons

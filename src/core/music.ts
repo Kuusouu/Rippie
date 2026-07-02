@@ -17,7 +17,7 @@ const platformPatterns: { platform: Platform; pattern: RegExp }[] = [
 	{
 		platform: Platform.AppleMusic,
 		pattern:
-			/^https?:\/\/music\.apple\.com\/[a-z]{2}\/album\/[^/]+\/\d+\?i=(\d+)/,
+			/^https?:\/\/music\.apple\.com\/[a-z]{2}\/album\/[^/]+\/\d+(?:\?i=\d+)?(?:$|\?|&)/,
 	},
 	{
 		platform: Platform.YouTubeMusic,

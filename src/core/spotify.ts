@@ -29,7 +29,6 @@ export type SpotifyTrackLookup = {
 	link: string;
 };
 
-
 // Spotify links always contain the track ID at the end before the query params (e.g., https://open.spotify.com/track/<id>?...)
 const TRACK_ID_PATTERN = /open\.spotify\.com\/track\/([a-zA-Z0-9]+)/;
 

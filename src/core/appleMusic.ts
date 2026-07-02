@@ -146,16 +146,24 @@ export const lookupAppleTrackByInfo = async (
 	let lowestMatchScore = Infinity;
 
 	for (const { link, trackId } of trackItems) {
-		const data = itunesResults.find((r) => r.trackId.toString() === trackId);
+		const data = itunesResults.find(
+			(r) => r.trackId.toString() === trackId,
+		);
 		if (!data) continue;
 
 		const rawItunesSignature = `${data.artistName} - ${data.collectionName}`;
-		const itunesScore = distance(targetSignature, normalizeText(rawItunesSignature));
+		const itunesScore = distance(
+			targetSignature,
+			normalizeText(rawItunesSignature),
+		);
 
 		let urlScore = 0;
 		const slugMatch = link.match(/\/album\/([^\/]+)\/\d+/);
 		if (slugMatch) {
-			urlScore = distance(normalizeText(song), normalizeText(slugMatch[1]));
+			urlScore = distance(
+				normalizeText(song),
+				normalizeText(slugMatch[1]),
+			);
 		}
 
 		const matchScore = itunesScore + urlScore;
