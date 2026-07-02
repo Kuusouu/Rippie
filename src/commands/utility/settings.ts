@@ -48,7 +48,7 @@ const buildSettingsAccessText = (settingsRoleIds: string[]): string => {
 	return 'Only members with one of the roles above can customize settings.';
 };
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('settings')
 		.setDescription('Configure the bot in your server'),

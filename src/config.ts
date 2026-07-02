@@ -1,7 +1,7 @@
 import { Client } from 'discord.js';
 import fs from 'node:fs';
 import path from 'node:path';
-import { BotConfig, SettingsStore } from './types';
+import type { BotConfig, SettingsStore } from './types';
 
 const configPath = path.join(__dirname, '../config.json');
 const settingsPath = path.join(__dirname, '../settings.json');

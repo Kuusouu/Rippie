@@ -162,9 +162,10 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 
 			const selectedChannelId = interaction.values[0];
 			if (interaction.guildId) {
-				client.settings[interaction.guildId] ??= {};
-				client.settings[interaction.guildId].musicChannelId =
-					selectedChannelId;
+				const guildSettings =
+					client.settings[interaction.guildId] ?? {};
+				guildSettings.musicChannelId = selectedChannelId;
+				client.settings[interaction.guildId] = guildSettings;
 				saveSettings(client);
 			}
 
@@ -289,16 +290,15 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 
 				if (interaction.customId === 'settings:music_services:accept') {
 					if (interaction.guildId) {
-						client.settings[interaction.guildId] ??= {};
-						client.settings[interaction.guildId].services =
-							Object.fromEntries(
-								getServiceEntries(client.config).map(
-									({ name }) => [
-										name,
-										selectedServices.includes(name),
-									],
-								),
-							);
+						const guildSettings =
+							client.settings[interaction.guildId] ?? {};
+						guildSettings.services = Object.fromEntries(
+							getServiceEntries(client.config).map(({ name }) => [
+								name,
+								selectedServices.includes(name),
+							]),
+						);
+						client.settings[interaction.guildId] = guildSettings;
 						saveSettings(client);
 					}
 
@@ -328,9 +328,10 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 
 			if (interaction.customId === 'settings:settings_roles:accept') {
 				if (interaction.guildId) {
-					client.settings[interaction.guildId] ??= {};
-					client.settings[interaction.guildId].settingsRoleIds =
-						selectedRoles;
+					const guildSettings =
+						client.settings[interaction.guildId] ?? {};
+					guildSettings.settingsRoleIds = selectedRoles;
+					client.settings[interaction.guildId] = guildSettings;
 					saveSettings(client);
 				}
 
