@@ -1,5 +1,5 @@
 import { distance } from 'fastest-levenshtein';
-import { TrackInfo } from '../types';
+import type { TrackInfo } from '../types';
 
 // --- Types ---
 
@@ -55,11 +55,11 @@ export const normalizeText = (text: string): string => {
 const extractAppleId = (url: string): string | null => {
 	// Prefer ?i= for a specific track
 	const trackMatch = url.match(/[?&]i=(\d+)/);
-	if (trackMatch) return trackMatch[1];
+	if (trackMatch) return trackMatch[1] ?? null;
 
 	// Fallback to the album ID at the end of the URL path
 	const albumMatch = url.match(/\/(\d+)(?:\?|$)/);
-	return albumMatch ? albumMatch[1] : null;
+	return albumMatch ? (albumMatch[1] ?? null) : null;
 };
 
 // Fetches one or more iTunes records by ID (comma-separated for batch).
@@ -75,7 +75,7 @@ const pickBestDeezerTrack = async (
 ): Promise<TrackInfo | null> => {
 	const deezerUrl = `https://api.deezer.com/search?q=${encodeURIComponent(targetSignature)}`;
 	const res = await fetch(deezerUrl);
-	const json = await res.json();
+	const json = (await res.json()) as any;
 
 	if (!json.data || !Array.isArray(json.data) || json.data.length === 0) {
 		return null;
@@ -132,7 +132,9 @@ export const lookupAppleTrackByInfo = async (
 
 	if (songMatches.length === 0) return null;
 
-	const cleanUrls = songMatches.map((m) => m[1].replace(/\\\//g, '/'));
+	const cleanUrls = songMatches.map((m) =>
+		(m[1] ?? '').replace(/\\\//g, '/'),
+	);
 	const topTrackUrls = [...new Set(cleanUrls)].slice(0, 5);
 
 	const trackItems = topTrackUrls
@@ -162,7 +164,7 @@ export const lookupAppleTrackByInfo = async (
 		if (slugMatch) {
 			urlScore = distance(
 				normalizeText(song),
-				normalizeText(slugMatch[1]),
+				normalizeText(slugMatch[1] ?? ''),
 			);
 		}
 
@@ -191,6 +193,7 @@ export const lookupAppleTrackByLink = async (
 	if (results.length === 0) return null;
 
 	const record = results[0];
+	if (!record) return null;
 	const artistName: string = record.artistName;
 	// Fallback to collectionName if trackName isn't present (album-level links)
 	const trackName: string =

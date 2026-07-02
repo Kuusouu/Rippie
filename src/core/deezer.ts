@@ -1,4 +1,4 @@
-import { TrackInfo } from '../types';
+import type { TrackInfo } from '../types';
 
 type DeezerTrack = {
 	id: number;

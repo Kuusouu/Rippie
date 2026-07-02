@@ -7,7 +7,9 @@
 		"dev": "bun --watch src/main.ts",
 		"typecheck": "tsc --noEmit",
 		"start": "bun src/main.ts",
-		"sync": "bun src/deploy-commands.js"
+		"sync": "bun src/deploy-commands.js",
+		"format": "bun run prettier --write .",
+		"format-check": "bun run prettier --check ."
 	},
 	"repository": {
 		"type": "git",

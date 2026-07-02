@@ -1,5 +1,5 @@
 import { env } from '../env';
-import { TrackInfo } from '../types';
+import type { TrackInfo } from '../types';
 
 type SpotifyTokenResponse = {
 	access_token: string;
