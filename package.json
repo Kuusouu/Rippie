@@ -1,6 +1,6 @@
 {
 	"name": "rippie",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"description": "A discord bot built by a dreamer.",
 	"main": "src/main.ts",
 	"scripts": {
