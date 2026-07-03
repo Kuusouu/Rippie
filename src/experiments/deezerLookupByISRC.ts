@@ -6,8 +6,8 @@
 // No auth required — the Deezer API is public for catalogue lookups.
 // Endpoint: GET https://api.deezer.com/track/isrc:{ISRC}
 //
-// Usage: npx tsx src/experiments/deezer-isrc-lookup.ts <isrc>
-// Example: npx tsx src/experiments/deezer-isrc-lookup.ts GBDUW0000059
+// Usage: bun run src/experiments/deezerLookupByISRC.ts <isrc>
+// Example: bun run src/experiments/deezerLookupByISRC.ts GBDUW0000059
 
 import { lookupDeezerTrackByIsrc } from '../core/deezer';
 
@@ -15,7 +15,7 @@ const main = async () => {
 	const isrc = process.argv[2];
 	if (!isrc) {
 		console.error(
-			'Usage: npx ts-node src/experiments/deezer-isrc-lookup.ts <isrc>',
+			'Usage: bun run src/experiments/deezerLookupByISRC.ts <isrc>',
 		);
 		process.exit(1);
 	}

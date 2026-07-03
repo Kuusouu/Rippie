@@ -3,8 +3,9 @@ import { generatePlatformButtons } from '../buttons';
 import { lookupAppleTrackByLink } from '../core/appleMusic';
 import { extractDeezerTrackId, fetchDeezerTrackInfo } from '../core/deezer';
 import { detectMusicPlatform, Platform } from '../core/music';
-import { resolveLinksFromIsrc } from '../core/resolver';
+import { resolveLinksFromTrack } from '../core/resolver';
 import { extractSpotifyTrackId, fetchSpotifyTrackInfo } from '../core/spotify';
+import { lookupYtMusicTrackByLink } from '../core/ytMusic';
 import type { TrackInfo } from '../types.ts';
 
 // Resolves a detected platform link to a TrackInfo object.
@@ -26,9 +27,11 @@ const resolveTrackInfo = async (
 	}
 
 	if (platform === Platform.AppleMusic) {
-		// lookupAppleTrackByLink uses Deezer internally as a metadata backbone,
-		// so it resolves ISRC + link regardless of whether Deezer is guild-enabled.
 		return lookupAppleTrackByLink(content);
+	}
+
+	if (platform === Platform.YouTubeMusic) {
+		return lookupYtMusicTrackByLink(content);
 	}
 
 	return null;
@@ -73,8 +76,7 @@ export const registerMessageHandler = (client: Client): void => {
 				.filter(([p, enabled]) => enabled && p !== platform)
 				.map(([p]) => p as Platform);
 
-			const resolvedLinks = await resolveLinksFromIsrc(
-				track.isrc,
+			const resolvedLinks = await resolveLinksFromTrack(
 				enabledPlatforms,
 				track,
 			);

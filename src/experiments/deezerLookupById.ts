@@ -7,8 +7,8 @@
 // Supports both direct links (deezer.com/track/{id}) and short share
 // links (link.deezer.com/s/...) which are resolved via HTTP redirect.
 //
-// Usage: npx tsx src/experiments/deezer-isrc.ts <deezer-track-url>
-// Example: npx tsx src/experiments/deezer-isrc.ts https://link.deezer.com/s/33HJubg3npxgAGfoCij0m
+// Usage: bun run src/experiments/deezerLookupById.ts <deezer-track-url>
+// Example: bun run src/experiments/deezerLookupById.ts https://link.deezer.com/s/33HJubg3npxgAGfoCij0m
 
 import { extractDeezerTrackId, fetchDeezerTrackInfo } from '../core/deezer';
 
@@ -16,7 +16,7 @@ const main = async () => {
 	const url = process.argv[2];
 	if (!url) {
 		console.error(
-			'Usage: npx ts-node src/experiments/deezer-isrc.ts <deezer-track-url>',
+			'Usage: bun run src/experiments/deezerLookupById.ts <deezer-track-url>',
 		);
 		process.exit(1);
 	}

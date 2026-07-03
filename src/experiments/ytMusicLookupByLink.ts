@@ -1,4 +1,4 @@
-import { lookupAppleTrackByLink } from '../core/appleMusic';
+import { lookupYtMusicTrackByLink } from '../core/ytMusic';
 
 const main = async () => {
 	const linkInput: string | undefined = process.argv[2];
@@ -6,12 +6,12 @@ const main = async () => {
 	if (!linkInput) {
 		console.log('\x1b[31m%s\x1b[0m', 'Error: Missing argument.');
 		console.log(
-			'Usage: bun run src/experiments/appleLookupByLink.ts "https://music.apple.com/us/album/..."',
+			'Usage: bun run src/experiments/ytMusicLookupByLink.ts "https://music.youtube.com/watch?v=..."',
 		);
 		process.exit(1);
 	}
 
-	const result = await lookupAppleTrackByLink(linkInput);
+	const result = await lookupYtMusicTrackByLink(linkInput);
 
 	if (result) {
 		console.log('--- DEEZER BEST MATCH ---');

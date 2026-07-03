@@ -3,8 +3,8 @@
 // Given an ISRC, queries the Spotify API to find the matching track
 // and returns the track name, artist(s), and a canonical Spotify link.
 //
-// Usage: npx tsx src/experiments/spotify-isrc-lookup.ts <isrc>
-// Example: npx tsx src/experiments/spotify-isrc-lookup.ts USBB10300001
+// Usage: bun run src/experiments/spotifyLookupByISRC.ts <isrc>
+// Example: bun run src/experiments/spotifyLookupByISRC.ts USBB10300001
 
 import { lookupSpotifyTrackByIsrc } from '../core/spotify';
 
@@ -12,7 +12,7 @@ const main = async () => {
 	const isrc = process.argv[2];
 	if (!isrc) {
 		console.error(
-			'Usage: npx ts-node src/experiments/spotify-isrc-lookup.ts <isrc>',
+			'Usage: bun run src/experiments/spotifyLookupByISRC.ts <isrc>',
 		);
 		process.exit(1);
 	}
