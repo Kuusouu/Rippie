@@ -19,7 +19,6 @@ bun.log
 
 # Environment & Secrets
 .env
-.env.*
 settings.json
 
 # TypeScript cache
@@ -32,10 +31,3 @@ Thumbs.db
 # IDE Files
 .vscode/
 .idea/
-
-# Ignore other package manager lockfiles to enforce Bun
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-
-# (Note: bun.lock is INTENTIONALLY NOT ignored because lockfiles should be tracked in Git)
