@@ -11,9 +11,7 @@ import { lookupSpotifyTrackByIsrc } from '../core/spotify';
 const main = async () => {
 	const isrc = process.argv[2];
 	if (!isrc) {
-		console.error(
-			'Usage: bun run src/experiments/spotifyLookupByISRC.ts <isrc>',
-		);
+		console.error('Usage: bun run src/experiments/spotifyLookupByISRC.ts <isrc>');
 		process.exit(1);
 	}
 

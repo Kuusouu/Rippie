@@ -14,9 +14,7 @@ import { lookupDeezerTrackByIsrc } from '../core/deezer';
 const main = async () => {
 	const isrc = process.argv[2];
 	if (!isrc) {
-		console.error(
-			'Usage: bun run src/experiments/deezerLookupByISRC.ts <isrc>',
-		);
+		console.error('Usage: bun run src/experiments/deezerLookupByISRC.ts <isrc>');
 		process.exit(1);
 	}
 

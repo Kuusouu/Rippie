@@ -35,11 +35,7 @@ export const generatePlatformButtons = (
 	// Discord limits 5 buttons per action row
 	const rows: ActionRowBuilder<ButtonBuilder>[] = [];
 	for (let i = 0; i < buttons.length; i += 5) {
-		rows.push(
-			new ActionRowBuilder<ButtonBuilder>().addComponents(
-				buttons.slice(i, i + 5),
-			),
-		);
+		rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(buttons.slice(i, i + 5)));
 	}
 
 	return rows;

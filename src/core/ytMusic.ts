@@ -57,9 +57,7 @@ export const lookupYtMusicTrackByInfo = async (
 	let lowestScore = Infinity;
 
 	for (const candidate of results) {
-		const candidateSignature = normalizeText(
-			`${candidate.artist.name} - ${candidate.name}`,
-		);
+		const candidateSignature = normalizeText(`${candidate.artist.name} - ${candidate.name}`);
 		const score = distance(targetSignature, candidateSignature);
 		if (score < lowestScore) {
 			lowestScore = score;
@@ -79,9 +77,7 @@ export const lookupYtMusicTrackByInfo = async (
 //   2. Fetching metadata from YouTube Music API
 //   3. Running a fuzzy Deezer search scored by Levenshtein distance
 // Returns null if any step fails to produce a confident match.
-export const lookupYtMusicTrackByLink = async (
-	url: string,
-): Promise<TrackInfo | null> => {
+export const lookupYtMusicTrackByLink = async (url: string): Promise<TrackInfo | null> => {
 	const videoId = extractYtMusicId(url);
 	if (!videoId) return null;
 

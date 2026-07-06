@@ -20,10 +20,7 @@ const getSelectionKey = (guildId: string | null, userId: string): string =>
 const pendingMusicServicesSelections = new Map<string, string[]>();
 const pendingSettingsRoleSelections = new Map<string, string[]>();
 
-const getSavedMusicServices = (
-	client: Client,
-	guildId: string | null,
-): string[] => {
+const getSavedMusicServices = (client: Client, guildId: string | null): string[] => {
 	if (!guildId) {
 		return [];
 	}
@@ -38,10 +35,7 @@ const getSavedMusicServices = (
 		.map(({ name }) => name);
 };
 
-const buildMusicServicesPayload = (
-	client: Client,
-	selectedServices: string[],
-) => {
+const buildMusicServicesPayload = (client: Client, selectedServices: string[]) => {
 	const selectedSummary =
 		selectedServices.length > 0
 			? selectedServices.map((name) => `• ${name}`).join('\n')
@@ -50,9 +44,7 @@ const buildMusicServicesPayload = (
 	const embed = new EmbedBuilder()
 		.setColor(0x00ff00)
 		.setTitle('Configure Music Services')
-		.setDescription(
-			'Select the services this community wants, then accept the changes.',
-		)
+		.setDescription('Select the services this community wants, then accept the changes.')
 		.addFields({
 			name: 'Current selection',
 			value: selectedSummary,
@@ -75,10 +67,7 @@ const buildMusicServicesPayload = (
 			})),
 		);
 
-	const selectRow =
-		new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-			selectMenu,
-		);
+	const selectRow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
 
 	const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
 		new ButtonBuilder()
@@ -102,9 +91,7 @@ const buildSettingsRolesPayload = (selectedRoles: string[]) => {
 	const embed = new EmbedBuilder()
 		.setColor(0x00ff00)
 		.setTitle('Configure Settings Roles')
-		.setDescription(
-			'Select the roles that can customize settings, then accept the changes.',
-		)
+		.setDescription('Select the roles that can customize settings, then accept the changes.')
 		.addFields({
 			name: 'Current selection',
 			value: selectedSummary,
@@ -121,8 +108,7 @@ const buildSettingsRolesPayload = (selectedRoles: string[]) => {
 		selectMenu.setDefaultRoles(selectedRoles);
 	}
 
-	const selectRow =
-		new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(selectMenu);
+	const selectRow = new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(selectMenu);
 
 	const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
 		new ButtonBuilder()
@@ -139,10 +125,7 @@ const buildSettingsRolesPayload = (selectedRoles: string[]) => {
 
 export const registerInteractionCreateHandler = (client: Client): void => {
 	client.on(Events.InteractionCreate, async (interaction) => {
-		if (
-			'customId' in interaction &&
-			interaction.customId.startsWith('settings:')
-		) {
+		if ('customId' in interaction && interaction.customId.startsWith('settings:')) {
 			if (
 				!hasSettingsAccess(
 					interaction,
@@ -162,8 +145,7 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 
 			const selectedChannelId = interaction.values[0];
 			if (interaction.guildId) {
-				const guildSettings =
-					client.settings[interaction.guildId] ?? {};
+				const guildSettings = client.settings[interaction.guildId] ?? {};
 				guildSettings.musicChannelId = selectedChannelId;
 				client.settings[interaction.guildId] = guildSettings;
 				saveSettings(client);
@@ -179,10 +161,7 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 		if (interaction.isRoleSelectMenu()) {
 			if (interaction.customId !== 'settings:settings_roles') return;
 
-			const key = getSelectionKey(
-				interaction.guildId,
-				interaction.user.id,
-			);
+			const key = getSelectionKey(interaction.guildId, interaction.user.id);
 			pendingSettingsRoleSelections.set(key, interaction.values);
 
 			await interaction.update({
@@ -193,10 +172,7 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 
 		if (interaction.isStringSelectMenu()) {
 			if (interaction.customId === 'settings:music_services') {
-				const key = getSelectionKey(
-					interaction.guildId,
-					interaction.user.id,
-				);
+				const key = getSelectionKey(interaction.guildId, interaction.user.id);
 				pendingMusicServicesSelections.set(key, interaction.values);
 
 				await interaction.update({
@@ -219,8 +195,7 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 					]);
 
 				await interaction.reply({
-					content:
-						'Choose the public channel where music should be posted.',
+					content: 'Choose the public channel where music should be posted.',
 					components: [
 						{
 							type: 1,
@@ -233,14 +208,8 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 			}
 
 			if (selectedChoice === 'music_services') {
-				const key = getSelectionKey(
-					interaction.guildId,
-					interaction.user.id,
-				);
-				const selectedServices = getSavedMusicServices(
-					client,
-					interaction.guildId,
-				);
+				const key = getSelectionKey(interaction.guildId, interaction.user.id);
+				const selectedServices = getSavedMusicServices(client, interaction.guildId);
 				pendingMusicServicesSelections.set(key, selectedServices);
 
 				await interaction.reply({
@@ -251,14 +220,8 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 			}
 
 			if (selectedChoice === 'settings_roles') {
-				const key = getSelectionKey(
-					interaction.guildId,
-					interaction.user.id,
-				);
-				const selectedRoles = getSavedSettingsRoles(
-					interaction.guildId,
-					client.settings,
-				);
+				const key = getSelectionKey(interaction.guildId, interaction.user.id);
+				const selectedRoles = getSavedSettingsRoles(interaction.guildId, client.settings);
 				pendingSettingsRoleSelections.set(key, selectedRoles);
 
 				await interaction.reply({
@@ -280,18 +243,14 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 			}
 
 			if (interaction.customId.startsWith('settings:music_services:')) {
-				const key = getSelectionKey(
-					interaction.guildId,
-					interaction.user.id,
-				);
+				const key = getSelectionKey(interaction.guildId, interaction.user.id);
 				const selectedServices =
 					pendingMusicServicesSelections.get(key) ??
 					getSavedMusicServices(client, interaction.guildId);
 
 				if (interaction.customId === 'settings:music_services:accept') {
 					if (interaction.guildId) {
-						const guildSettings =
-							client.settings[interaction.guildId] ?? {};
+						const guildSettings = client.settings[interaction.guildId] ?? {};
 						guildSettings.services = Object.fromEntries(
 							getServiceEntries(client.config).map(({ name }) => [
 								name,
@@ -318,18 +277,14 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 				return;
 			}
 
-			const key = getSelectionKey(
-				interaction.guildId,
-				interaction.user.id,
-			);
+			const key = getSelectionKey(interaction.guildId, interaction.user.id);
 			const selectedRoles =
 				pendingSettingsRoleSelections.get(key) ??
 				getSavedSettingsRoles(interaction.guildId, client.settings);
 
 			if (interaction.customId === 'settings:settings_roles:accept') {
 				if (interaction.guildId) {
-					const guildSettings =
-						client.settings[interaction.guildId] ?? {};
+					const guildSettings = client.settings[interaction.guildId] ?? {};
 					guildSettings.settingsRoleIds = selectedRoles;
 					client.settings[interaction.guildId] = guildSettings;
 					saveSettings(client);
@@ -339,9 +294,7 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 				await interaction.update({
 					content: `Settings roles saved: ${
 						selectedRoles.length > 0
-							? selectedRoles
-									.map((roleId) => `<@&${roleId}>`)
-									.join(', ')
+							? selectedRoles.map((roleId) => `<@&${roleId}>`).join(', ')
 							: 'admins only'
 					}.`,
 					embeds: [],
@@ -354,13 +307,9 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 		}
 
 		if (!interaction.isChatInputCommand()) return;
-		const command = interaction.client.commands.get(
-			interaction.commandName,
-		);
+		const command = interaction.client.commands.get(interaction.commandName);
 		if (!command) {
-			console.error(
-				`No command matching ${interaction.commandName} was found.`,
-			);
+			console.error(`No command matching ${interaction.commandName} was found.`);
 			return;
 		}
 		try {

@@ -59,9 +59,7 @@ const getAccessToken = async (): Promise<string> => {
 	});
 
 	if (!response.ok) {
-		throw new Error(
-			`Spotify auth failed: ${response.status} ${response.statusText}`,
-		);
+		throw new Error(`Spotify auth failed: ${response.status} ${response.statusText}`);
 	}
 
 	const data = (await response.json()) as SpotifyTokenResponse;
@@ -72,24 +70,17 @@ const getAccessToken = async (): Promise<string> => {
 	return cachedToken;
 };
 
-export const fetchSpotifyTrackInfo = async (
-	trackId: string,
-): Promise<TrackInfo> => {
+export const fetchSpotifyTrackInfo = async (trackId: string): Promise<TrackInfo> => {
 	const token = await getAccessToken();
 
-	const response = await fetch(
-		`https://api.spotify.com/v1/tracks/${trackId}`,
-		{
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
+	const response = await fetch(`https://api.spotify.com/v1/tracks/${trackId}`, {
+		headers: {
+			Authorization: `Bearer ${token}`,
 		},
-	);
+	});
 
 	if (!response.ok) {
-		throw new Error(
-			`Spotify track fetch failed: ${response.status} ${response.statusText}`,
-		);
+		throw new Error(`Spotify track fetch failed: ${response.status} ${response.statusText}`);
 	}
 
 	const track = (await response.json()) as SpotifyTrack;
@@ -118,9 +109,7 @@ export const lookupSpotifyTrackByIsrc = async (
 	});
 
 	if (!response.ok) {
-		throw new Error(
-			`Spotify ISRC search failed: ${response.status} ${response.statusText}`,
-		);
+		throw new Error(`Spotify ISRC search failed: ${response.status} ${response.statusText}`);
 	}
 
 	const data = (await response.json()) as SpotifySearchResponse;

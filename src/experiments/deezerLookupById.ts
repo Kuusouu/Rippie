@@ -15,9 +15,7 @@ import { extractDeezerTrackId, fetchDeezerTrackInfo } from '../core/deezer';
 const main = async () => {
 	const url = process.argv[2];
 	if (!url) {
-		console.error(
-			'Usage: bun run src/experiments/deezerLookupById.ts <deezer-track-url>',
-		);
+		console.error('Usage: bun run src/experiments/deezerLookupById.ts <deezer-track-url>');
 		process.exit(1);
 	}
 

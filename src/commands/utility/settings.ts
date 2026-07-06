@@ -76,14 +76,9 @@ export default {
 
 		const servicesText =
 			services.length > 0
-				? services
-						.map(({ name, emoji }) => `${emoji} ${name}`)
-						.join('\n')
+				? services.map(({ name, emoji }) => `${emoji} ${name}`).join('\n')
 				: 'No services have been configured yet.';
-		const musicServicesText = buildMusicServicesText(
-			guildServices,
-			services,
-		);
+		const musicServicesText = buildMusicServicesText(guildServices, services);
 		const musicChannelText = buildMusicChannelText(musicChannelId);
 		const settingsRolesText = buildSettingsRolesText(settingsRoleIds);
 		const settingsAccessText = buildSettingsAccessText(settingsRoleIds);
@@ -91,9 +86,7 @@ export default {
 		const embed = new EmbedBuilder()
 			.setColor(0x00ff00)
 			.setTitle('Configure Rippie')
-			.setDescription(
-				'Choose what you want to configure from the menu below.',
-			)
+			.setDescription('Choose what you want to configure from the menu below.')
 			.addFields(
 				{
 					name: 'Music Channel',
@@ -121,26 +114,22 @@ export default {
 			.addOptions(
 				{
 					label: 'Music channel',
-					description:
-						'Pick the channel where Rippie will look for music links.',
+					description: 'Pick the channel where Rippie will look for music links.',
 					value: 'music_channel',
 				},
 				{
 					label: 'Music services',
-					description:
-						'Pick which music services this community uses.',
+					description: 'Pick which music services this community uses.',
 					value: 'music_services',
 				},
 				{
 					label: 'Settings roles',
-					description:
-						'Pick the roles that can change settings in this server.',
+					description: 'Pick the roles that can change settings in this server.',
 					value: 'settings_roles',
 				},
 			);
 
-		const row =
-			new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu);
+		const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu);
 
 		await interaction.reply({
 			embeds: [embed],

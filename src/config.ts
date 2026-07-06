@@ -14,10 +14,7 @@ export const loadBotConfig = (): BotConfig => {
 	try {
 		return JSON.parse(fs.readFileSync(configPath, 'utf8')) as BotConfig;
 	} catch (error) {
-		console.error(
-			'Failed to load config.json, continuing without services.',
-			error,
-		);
+		console.error('Failed to load config.json, continuing without services.', error);
 		return {};
 	}
 };
@@ -28,14 +25,9 @@ export const loadSettings = (): SettingsStore => {
 	}
 
 	try {
-		return JSON.parse(
-			fs.readFileSync(settingsPath, 'utf8'),
-		) as SettingsStore;
+		return JSON.parse(fs.readFileSync(settingsPath, 'utf8')) as SettingsStore;
 	} catch (error) {
-		console.error(
-			'Failed to load settings.json, starting with an empty store.',
-			error,
-		);
+		console.error('Failed to load settings.json, starting with an empty store.', error);
 		return {};
 	}
 };
@@ -55,10 +47,7 @@ export const loadSettings = (): SettingsStore => {
 // pattern on top of a single JSON file, since the file-based approach
 // itself becomes the limiting factor before write-concurrency does.
 export const saveSettings = (client: Client): void => {
-	fs.writeFileSync(
-		settingsPath,
-		`${JSON.stringify(client.settings, null, 2)}\n`,
-	);
+	fs.writeFileSync(settingsPath, `${JSON.stringify(client.settings, null, 2)}\n`);
 };
 
 export const getServiceEntries = (config: BotConfig) => {

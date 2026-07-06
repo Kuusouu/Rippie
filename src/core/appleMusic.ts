@@ -63,9 +63,7 @@ export const lookupAppleTrackByInfo = async (
 
 	if (songMatches.length === 0) return null;
 
-	const cleanUrls = songMatches.map((m) =>
-		(m[1] ?? '').replace(/\\\//g, '/'),
-	);
+	const cleanUrls = songMatches.map((m) => (m[1] ?? '').replace(/\\\//g, '/'));
 	const topTrackUrls = [...new Set(cleanUrls)].slice(0, 5);
 
 	const trackItems = topTrackUrls
@@ -79,24 +77,16 @@ export const lookupAppleTrackByInfo = async (
 	let lowestMatchScore = Infinity;
 
 	for (const { link, trackId } of trackItems) {
-		const data = itunesResults.find(
-			(r) => r.trackId.toString() === trackId,
-		);
+		const data = itunesResults.find((r) => r.trackId.toString() === trackId);
 		if (!data) continue;
 
 		const rawItunesSignature = `${data.artistName} - ${data.collectionName}`;
-		const itunesScore = distance(
-			targetSignature,
-			normalizeText(rawItunesSignature),
-		);
+		const itunesScore = distance(targetSignature, normalizeText(rawItunesSignature));
 
 		let urlScore = 0;
 		const slugMatch = link.match(/\/album\/([^/]+)\/\d+/);
 		if (slugMatch) {
-			urlScore = distance(
-				normalizeText(song),
-				normalizeText(slugMatch[1] ?? ''),
-			);
+			urlScore = distance(normalizeText(song), normalizeText(slugMatch[1] ?? ''));
 		}
 
 		const matchScore = itunesScore + urlScore;
@@ -114,9 +104,7 @@ export const lookupAppleTrackByInfo = async (
 //   2. Fetching metadata from the iTunes Lookup API
 //   3. Running a fuzzy Deezer search scored by Levenshtein distance
 // Returns null if any step fails to produce a confident match.
-export const lookupAppleTrackByLink = async (
-	url: string,
-): Promise<TrackInfo | null> => {
+export const lookupAppleTrackByLink = async (url: string): Promise<TrackInfo | null> => {
 	const appleId = extractAppleId(url);
 	if (!appleId) return null;
 

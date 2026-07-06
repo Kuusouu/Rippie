@@ -10,10 +10,7 @@ import type { TrackInfo } from '../types.ts';
 
 // Resolves a detected platform link to a TrackInfo object.
 // Returns null if the track ID cannot be extracted or the platform isn't handled yet.
-const resolveTrackInfo = async (
-	platform: Platform,
-	content: string,
-): Promise<TrackInfo | null> => {
+const resolveTrackInfo = async (platform: Platform, content: string): Promise<TrackInfo | null> => {
 	if (platform === Platform.Spotify) {
 		const trackId = extractSpotifyTrackId(content);
 		if (!trackId) return null;
@@ -58,9 +55,7 @@ export const registerMessageHandler = (client: Client): void => {
 			// Step 1: Resolve the track info (name, artists, ISRC) from the source link
 			const track = await resolveTrackInfo(platform, message.content);
 			if (!track) {
-				await message.reply(
-					`${platform} link detected, but could not resolve track info.`,
-				);
+				await message.reply(`${platform} link detected, but could not resolve track info.`);
 				return;
 			}
 
@@ -76,10 +71,7 @@ export const registerMessageHandler = (client: Client): void => {
 				.filter(([p, enabled]) => enabled && p !== platform)
 				.map(([p]) => p as Platform);
 
-			const resolvedLinks = await resolveLinksFromTrack(
-				enabledPlatforms,
-				track,
-			);
+			const resolvedLinks = await resolveLinksFromTrack(enabledPlatforms, track);
 
 			// Step 3: Build platform buttons
 			const rows = generatePlatformButtons(
@@ -95,9 +87,7 @@ export const registerMessageHandler = (client: Client): void => {
 			});
 		} catch (error) {
 			console.error(`Failed to fetch ${platform} track info:`, error);
-			await message.reply(
-				`${platform} link detected, but failed to fetch track info.`,
-			);
+			await message.reply(`${platform} link detected, but failed to fetch track info.`);
 		}
 	});
 };

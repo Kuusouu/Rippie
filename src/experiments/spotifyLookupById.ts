@@ -12,9 +12,7 @@ import { extractSpotifyTrackId, fetchSpotifyTrackInfo } from '../core/spotify';
 const main = async () => {
 	const url = process.argv[2];
 	if (!url) {
-		console.error(
-			'Usage: bun run src/experiments/spotifyLookupById.ts <spotify-track-url>',
-		);
+		console.error('Usage: bun run src/experiments/spotifyLookupById.ts <spotify-track-url>');
 		process.exit(1);
 	}
 

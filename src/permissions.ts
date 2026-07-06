@@ -53,11 +53,7 @@ export const hasSettingsAccess = (
 	}
 
 	if (allowedRoles.length === 0) {
-		return (
-			interaction.memberPermissions?.has(
-				PermissionsBitField.Flags.Administrator,
-			) ?? false
-		);
+		return interaction.memberPermissions?.has(PermissionsBitField.Flags.Administrator) ?? false;
 	}
 
 	const memberRoleIds = getMemberRoleIds(

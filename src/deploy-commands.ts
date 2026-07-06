@@ -25,9 +25,7 @@ const guildIds = env.GUILDS;
 			const commandFiles = fs
 				.readdirSync(commandsPath)
 				.filter((file) =>
-					commandFileExtensions.some((extension) =>
-						file.endsWith(extension),
-					),
+					commandFileExtensions.some((extension) => file.endsWith(extension)),
 				);
 
 			// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
@@ -55,10 +53,9 @@ const guildIds = env.GUILDS;
 
 		for (const guildId of guildIds) {
 			// The put method is used to fully refresh all commands in each guild with the current set
-			const data = (await rest.put(
-				Routes.applicationGuildCommands(env.CLIENTID, guildId),
-				{ body: commands },
-			)) as unknown[];
+			const data = (await rest.put(Routes.applicationGuildCommands(env.CLIENTID, guildId), {
+				body: commands,
+			})) as unknown[];
 
 			console.log(
 				`Successfully reloaded ${data.length} application (/) commands for guild ${guildId}.`,

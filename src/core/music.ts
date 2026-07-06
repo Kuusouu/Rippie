@@ -11,18 +11,15 @@ export type Platform = (typeof Platform)[keyof typeof Platform];
 const platformPatterns: { platform: Platform; pattern: RegExp }[] = [
 	{
 		platform: Platform.Spotify,
-		pattern:
-			/^https?:\/\/open\.spotify\.com\/track\/([a-zA-Z0-9]+)(?:\?|$)/,
+		pattern: /^https?:\/\/open\.spotify\.com\/track\/([a-zA-Z0-9]+)(?:\?|$)/,
 	},
 	{
 		platform: Platform.AppleMusic,
-		pattern:
-			/^https?:\/\/music\.apple\.com\/[a-z]{2}\/album\/[^/]+\/\d+(?:\?i=\d+)?(?:$|\?|&)/,
+		pattern: /^https?:\/\/music\.apple\.com\/[a-z]{2}\/album\/[^/]+\/\d+(?:\?i=\d+)?(?:$|\?|&)/,
 	},
 	{
 		platform: Platform.YouTubeMusic,
-		pattern:
-			/^https?:\/\/music\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})(?:&|$)/,
+		pattern: /^https?:\/\/music\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})(?:&|$)/,
 	},
 	{
 		platform: Platform.Deezer,
@@ -31,8 +28,7 @@ const platformPatterns: { platform: Platform; pattern: RegExp }[] = [
 	},
 	{
 		platform: Platform.Tidal,
-		pattern:
-			/^https?:\/\/(?:www\.)?tidal\.com\/(?:browse\/)?track\/([0-9]+)/,
+		pattern: /^https?:\/\/(?:www\.)?tidal\.com\/(?:browse\/)?track\/([0-9]+)/,
 	},
 ];
 

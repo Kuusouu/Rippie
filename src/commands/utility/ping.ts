@@ -8,9 +8,7 @@ import {
 export default {
 	data: new SlashCommandBuilder()
 		.setName('ping')
-		.setDescription(
-			'Checks Discord latency and lets the milliseconds explain themselves.',
-		),
+		.setDescription('Checks Discord latency and lets the milliseconds explain themselves.'),
 	async execute(interaction: ChatInputCommandInteraction): Promise<void> {
 		const websocketLatency = Math.round(interaction.client.ws.ping);
 		const startTime = interaction.createdTimestamp;

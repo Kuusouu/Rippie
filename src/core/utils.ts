@@ -49,9 +49,7 @@ interface DeezerResponse {
 
 // Picks the best Deezer result for a given target signature using Levenshtein distance.
 // This is heavily used by platforms that lack built-in ISRC resolving to bridge the gap.
-export const pickBestDeezerTrack = async (
-	targetSignature: string,
-): Promise<TrackInfo | null> => {
+export const pickBestDeezerTrack = async (targetSignature: string): Promise<TrackInfo | null> => {
 	const deezerUrl = `https://api.deezer.com/search?q=${encodeURIComponent(targetSignature)}`;
 	const res = await fetch(deezerUrl);
 	const json = (await res.json()) as DeezerResponse;
@@ -64,9 +62,7 @@ export const pickBestDeezerTrack = async (
 	let lowestScore = Infinity;
 
 	for (const track of json.data) {
-		const deezerSignature = normalizeText(
-			`${track.artist.name} - ${track.title}`,
-		);
+		const deezerSignature = normalizeText(`${track.artist.name} - ${track.title}`);
 		const score = distance(targetSignature, deezerSignature);
 		if (score < lowestScore) {
 			lowestScore = score;

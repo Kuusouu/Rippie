@@ -28,10 +28,7 @@ export default {
 			});
 
 		const view = new ActionRowBuilder<ButtonBuilder>().addComponents(
-			new ButtonBuilder()
-				.setLabel('GITHUB')
-				.setURL(githubProject)
-				.setStyle(ButtonStyle.Link),
+			new ButtonBuilder().setLabel('GITHUB').setURL(githubProject).setStyle(ButtonStyle.Link),
 			new ButtonBuilder()
 				.setLabel('SUPPORT SERVER')
 				.setURL(supportUrl)
