@@ -25,6 +25,7 @@ Have an idea for a new feature or music platform integration? Great! Open an iss
 5. **Write your code** and make sure things are strictly typed. Avoid `any`.
 6. **Format and lint**: Run `bun run format` and `bun run format-check` before committing.
 7. **Test manually**: Rippie interacts with multiple external APIs (Spotify, Apple Music, etc.). Ensure you have manually tested your changes against real links in a Discord server or the experiments (these are thin CLI wrappers for the core functionality).
+8. **Commit your changes**: Keep commit messages concise. Explanations are fine, but avoid writing a wall of text. You MUST follow the [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) specification (e.g., `feat: added Spotify support`).
 
 ## Pull Requests
 

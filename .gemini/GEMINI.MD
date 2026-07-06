@@ -16,3 +16,4 @@ You are assisting with the development of Rippie, a Discord bot built with TypeS
 2. **Review Before Committing:** After making changes, you MUST show the user a summary of every file changed and a diff-style overview. Tell the user exactly what happened so they can review it before considering the task complete.
 3. **Discord API?** Reference the official [Discord.js documentation](https://discord.js.org/docs/packages/discord.js/14.26.4).
 4. **Adding Dependencies?** Rippie uses `bun`. Do not add new `npm` packages without explicit user permission. Prioritize native standard library solutions where possible.
+5. **Writing Commits?** Keep commit messages concise. You can explain changes, but do NOT generate a wall of text. You MUST follow the [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) specification.
