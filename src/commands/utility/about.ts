@@ -7,7 +7,7 @@ import {
 	SlashCommandBuilder,
 } from 'discord.js';
 
-const ownerUrl = 'https://github.com/omarnunezsiri';
+const ownerUrl = 'https://github.com/mewclouds';
 const githubProject = 'https://github.com/Kuusouu/Rippie';
 const supportUrl = 'https://discord.gg/';
 const aboutThumbnailUrl = 'https://placehold.co/512x512/png?text=Rippie';

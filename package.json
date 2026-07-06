@@ -16,8 +16,8 @@
 		"url": "git+https://github.com/Kuusouu/Rippie.git"
 	},
 	"keywords": [],
-	"author": "omarnunezsiri",
-	"license": "MIT",
+	"author": "mewclouds",
+	"license": "AGPL-3.0-or-later",
 	"type": "commonjs",
 	"bugs": {
 		"url": "https://github.com/Kuusouu/Rippie/issues"

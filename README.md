@@ -2,9 +2,9 @@
 
 # 🎵 Rippie
 
-[![GitHub release](https://img.shields.io/github/v/release/Kuusouu/Rippie?style=for-the-badge&color=7c3aed&label=Latest)](https://github.com/Kuusouu/Rippie/releases)
-[![License](https://img.shields.io/github/license/Kuusouu/Rippie?style=for-the-badge&color=10b981)](LICENSE)
-[![Last Commit](https://img.shields.io/github/last-commit/Kuusouu/Rippie?style=for-the-badge&color=6366f1)](https://github.com/Kuusouu/Rippie/commits)
+[![GitHub release](https://img.shields.io/github/v/release/Kuusouu/Rippie?style=for-the-badge&color=FF6B35&label=Latest)](https://github.com/Kuusouu/Rippie/releases)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-00B4D8.svg?style=for-the-badge)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/Kuusouu/Rippie?style=for-the-badge&color=FF6F61&label=Last%20Commit)](https://github.com/Kuusouu/Rippie/commits)
 
 </div>
 
@@ -63,4 +63,4 @@ Not ready for contributions yet, but feel free to open issues with ideas or feed
 
 ## 📄 License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the AGPLv3 License. See `LICENSE` for more information.
