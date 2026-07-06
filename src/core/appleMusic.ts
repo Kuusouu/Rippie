@@ -8,6 +8,7 @@ interface ITunesResult {
 	trackId: number;
 	artistName: string;
 	collectionName: string;
+	trackName?: string;
 }
 
 interface ITunesLookupResponse {
@@ -90,7 +91,7 @@ export const lookupAppleTrackByInfo = async (
 		);
 
 		let urlScore = 0;
-		const slugMatch = link.match(/\/album\/([^\/]+)\/\d+/);
+		const slugMatch = link.match(/\/album\/([^/]+)\/\d+/);
 		if (slugMatch) {
 			urlScore = distance(
 				normalizeText(song),
@@ -126,8 +127,7 @@ export const lookupAppleTrackByLink = async (
 	if (!record) return null;
 	const artistName: string = record.artistName;
 	// Fallback to collectionName if trackName isn't present (album-level links)
-	const trackName: string =
-		(record as any).trackName || record.collectionName;
+	const trackName: string = record.trackName || record.collectionName;
 
 	const targetSignature = normalizeText(`${artistName} - ${trackName}`);
 	return pickBestDeezerTrack(targetSignature);

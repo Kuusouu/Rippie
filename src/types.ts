@@ -1,3 +1,5 @@
+import type { ChatInputCommandInteraction } from 'discord.js';
+
 export type ServiceConfig = {
 	emoji: string;
 };
@@ -21,3 +23,8 @@ export type TrackInfo = {
 	isrc: string | null;
 	link: string | null;
 };
+
+export interface Command {
+	data: unknown;
+	execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
+}

@@ -6,6 +6,13 @@ import { normalizeText, pickBestDeezerTrack } from './utils';
 // Singleton instance of YTMusic
 let ytmusicInstance: YTMusic | null = null;
 
+interface YTMusicSong {
+	artists?: { name: string }[];
+	artist?: { name: string };
+	author?: string;
+	name: string;
+}
+
 const getYTMusic = async (): Promise<YTMusic> => {
 	if (!ytmusicInstance) {
 		ytmusicInstance = new YTMusic();
@@ -24,7 +31,7 @@ export const extractYtMusicId = (url: string): string | null => {
 		if (urlObj.hostname === 'youtu.be') {
 			return urlObj.pathname.slice(1);
 		}
-	} catch (e) {
+	} catch {
 		// fallback to regex if URL parsing fails
 	}
 	const match = url.match(/(?:v=|youtu\.be\/)([\w-]+)/);
@@ -79,10 +86,10 @@ export const lookupYtMusicTrackByLink = async (
 	if (!videoId) return null;
 
 	const ytmusic = await getYTMusic();
-	let songInfo: any;
+	let songInfo: YTMusicSong;
 	try {
 		songInfo = await ytmusic.getSong(videoId);
-	} catch (e) {
+	} catch {
 		return null; // e.g. video unavailable
 	}
 
@@ -90,7 +97,7 @@ export const lookupYtMusicTrackByLink = async (
 
 	const artistName =
 		Array.isArray(songInfo.artists) && songInfo.artists.length > 0
-			? songInfo.artists[0].name
+			? songInfo.artists[0]?.name
 			: songInfo.artist?.name || songInfo.author || 'Unknown';
 
 	const targetSignature = normalizeText(`${artistName} - ${songInfo.name}`);

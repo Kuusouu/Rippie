@@ -1,11 +1,11 @@
 // Credits to the discord.js Get Started Guide
 
-const { REST, Routes } = require('discord.js');
-const fs = require('node:fs');
-const path = require('node:path');
-const { env } = require('./env');
+import { REST, Routes } from 'discord.js';
+import fs from 'node:fs';
+import path from 'node:path';
+import { env } from './env';
 
-const commands = [];
+const commands: unknown[] = [];
 const commandFileExtensions = ['.js', '.ts'];
 
 // Construct and prepare an instance of the REST module
@@ -16,7 +16,7 @@ const guildIds = env.GUILDS;
 (async () => {
 	try {
 		// Grab all the command folders from the commands directory
-		const foldersPath = path.join(__dirname, 'commands');
+		const foldersPath = path.join(import.meta.dir, 'commands');
 		const commandFolders = fs.readdirSync(foldersPath);
 
 		for (const folder of commandFolders) {
@@ -35,7 +35,7 @@ const guildIds = env.GUILDS;
 				const filePath = path.join(commandsPath, file);
 				const commandModule = await import(filePath);
 				const command = commandModule.default;
-				if ('data' in command && 'execute' in command) {
+				if (command && 'data' in command && 'execute' in command) {
 					commands.push(command.data.toJSON());
 				} else {
 					console.log(
@@ -55,10 +55,10 @@ const guildIds = env.GUILDS;
 
 		for (const guildId of guildIds) {
 			// The put method is used to fully refresh all commands in each guild with the current set
-			const data = await rest.put(
+			const data = (await rest.put(
 				Routes.applicationGuildCommands(env.CLIENTID, guildId),
 				{ body: commands },
-			);
+			)) as unknown[];
 
 			console.log(
 				`Successfully reloaded ${data.length} application (/) commands for guild ${guildId}.`,

@@ -11,7 +11,7 @@ export const normalizeText = (text: string): string => {
 	cleaned = cleaned.replace(/[-_]/g, ' ');
 
 	// Strip punctuation elements
-	cleaned = cleaned.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()\[\]™]/g, '');
+	cleaned = cleaned.replace(/[.,/#!$%^&*;:{}=\-_`~()[\]™]/g, '');
 
 	// Truncate anything trailing feature artist credits
 	cleaned = cleaned.replace(/\b(feat|ft|featuring)\b[\s\S]*/g, '');
@@ -36,6 +36,17 @@ export const normalizeText = (text: string): string => {
 	return cleaned.replace(/\s+/g, ' ').trim();
 };
 
+interface DeezerTrack {
+	title: string;
+	artist: { name: string };
+	isrc?: string;
+	link?: string;
+}
+
+interface DeezerResponse {
+	data?: DeezerTrack[];
+}
+
 // Picks the best Deezer result for a given target signature using Levenshtein distance.
 // This is heavily used by platforms that lack built-in ISRC resolving to bridge the gap.
 export const pickBestDeezerTrack = async (
@@ -43,13 +54,13 @@ export const pickBestDeezerTrack = async (
 ): Promise<TrackInfo | null> => {
 	const deezerUrl = `https://api.deezer.com/search?q=${encodeURIComponent(targetSignature)}`;
 	const res = await fetch(deezerUrl);
-	const json = (await res.json()) as any;
+	const json = (await res.json()) as DeezerResponse;
 
 	if (!json.data || !Array.isArray(json.data) || json.data.length === 0) {
 		return null;
 	}
 
-	let bestTrack: any = null;
+	let bestTrack: DeezerTrack | null = null;
 	let lowestScore = Infinity;
 
 	for (const track of json.data) {
