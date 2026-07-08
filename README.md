@@ -49,7 +49,7 @@ Rippie started as a Python project. Along the way I decided to challenge myself 
 
 ## Status
 
-🌊 Active development — core cross-platform resolution is working. More platforms and polish coming soon.
+🌊 Active development — core cross-platform resolution is working. More platforms and polish coming soon. Looking to release the first official release (v1.0.0) soon.
 
 ## Built with
 
