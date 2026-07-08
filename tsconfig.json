@@ -26,6 +26,6 @@
 		"noUnusedParameters": false,
 		"noPropertyAccessFromIndexSignature": false
 	},
-	"include": ["src/**/*.ts", "src/deploy-commands.js"],
+	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules", "dist"]
 }
