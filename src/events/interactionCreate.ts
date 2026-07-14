@@ -17,6 +17,8 @@ import { getSavedSettingsRoles, hasSettingsAccess } from '../permissions';
 const getSelectionKey = (guildId: string | null, userId: string): string =>
 	`${guildId ?? 'dm'}:${userId}`;
 
+// State Maps
+// Note: This can leak memory if users open a menu but never click "Accept".
 const pendingMusicServicesSelections = new Map<string, string[]>();
 const pendingSettingsRoleSelections = new Map<string, string[]>();
 
@@ -34,6 +36,8 @@ const getSavedMusicServices = (client: Client, guildId: string | null): string[]
 		.filter(({ name }) => guildSettings.services?.[name])
 		.map(({ name }) => name);
 };
+
+// Payload Builders
 
 const buildMusicServicesPayload = (client: Client, selectedServices: string[]) => {
 	const selectedSummary =
@@ -140,6 +144,7 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 			}
 		}
 
+		// Handle Channel Selection
 		if (interaction.isChannelSelectMenu()) {
 			if (interaction.customId !== 'settings:music_channel') return;
 
@@ -158,6 +163,7 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 			return;
 		}
 
+		// Handle Role Selection
 		if (interaction.isRoleSelectMenu()) {
 			if (interaction.customId !== 'settings:settings_roles') return;
 
@@ -170,6 +176,7 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 			return;
 		}
 
+		// Handle String Dropdowns
 		if (interaction.isStringSelectMenu()) {
 			if (interaction.customId === 'settings:music_services') {
 				const key = getSelectionKey(interaction.guildId, interaction.user.id);
@@ -234,6 +241,7 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 			return;
 		}
 
+		// Handle Button Clicks
 		if (interaction.isButton()) {
 			if (
 				!interaction.customId.startsWith('settings:music_services:') &&
@@ -306,6 +314,7 @@ export const registerInteractionCreateHandler = (client: Client): void => {
 			return;
 		}
 
+		// Handle Slash Commands
 		if (!interaction.isChatInputCommand()) return;
 		const command = interaction.client.commands.get(interaction.commandName);
 		if (!command) {

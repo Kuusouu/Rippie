@@ -32,20 +32,12 @@ export const loadSettings = (): SettingsStore => {
 	}
 };
 
-// Intentionally synchronous. This blocks the event loop for the duration of
-// the write, but that's a feature here, not a bug: it guarantees saves can
-// never overlap or interleave with each other, even if multiple servers
-// trigger a setting change in quick succession. No queueing/coalescing
-// logic needed.
+// Uses a synchronous write to prevent data corruption from concurrent saves without needing a queue.
+// This is perfectly fine for a small, self-hosted bot.
 //
-// This is fine as long as settings.json stays small and saves stay
-// infrequent (the expected case for a self-hosted bot in a handful of
-// servers). If this bot is ever run at much larger scale with frequent
-// saves and/or a large settings file, the blocking write may become a
-// noticeable bottleneck. At that point, we could consider moving to a real
-// database (e.g. SQLite) rather than reaching for an async queued-write
-// pattern on top of a single JSON file, since the file-based approach
-// itself becomes the limiting factor before write-concurrency does.
+// If scaled to a massive bot (e.g., serving thousands of Discord communities with constant settings updates),
+// this blocking operation will stall the event loop. At that point, migrating to a real database
+// like bun:sqlite is highly recommended over a JSON file.
 export const saveSettings = (client: Client): void => {
 	fs.writeFileSync(settingsPath, `${JSON.stringify(client.settings, null, 2)}\n`);
 };

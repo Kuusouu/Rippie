@@ -22,10 +22,12 @@ client.commands = new Collection();
 client.settings = loadSettings();
 client.config = loadBotConfig();
 
+// Register Event Handlers
 registerClientReadyHandler(client);
 registerMessageHandler(client);
 registerInteractionCreateHandler(client);
 
+// Load Slash Commands
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 for (const folder of commandFolders) {

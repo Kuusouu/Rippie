@@ -1,3 +1,10 @@
+// YT Music Lookup By Info Experiment
+//
+// Manual testing script to verify the fuzzy matching of YouTube Music
+// search results based on artist and song name.
+//
+// Usage: bun run src/experiments/ytMusicLookupByInfo.ts "Artist Name" "Song Title"
+
 import { lookupYtMusicTrackByInfo } from '../core/ytMusic';
 
 const main = async () => {

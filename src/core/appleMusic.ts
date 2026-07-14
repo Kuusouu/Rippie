@@ -1,8 +1,18 @@
+/**
+ * Apple Music / iTunes Core Module
+ *
+ * NOTE: The official Apple Music API is behind a paywall. While the free iTunes
+ * Search API exists, it can sometimes miss information or be unreliable for direct
+ * lookups. To work around this, we use a hybrid approach: we scrape the public Apple
+ * Music search page to find candidate links, and then validate those candidates
+ * against the iTunes Lookup API to ensure accuracy and retrieve high-quality metadata.
+ */
+
 import { distance } from 'fastest-levenshtein';
 import type { TrackInfo } from '../types';
 import { normalizeText, pickBestDeezerTrack } from './utils';
 
-// --- Types ---
+// Types
 
 interface ITunesResult {
 	trackId: number;
@@ -15,12 +25,9 @@ interface ITunesLookupResponse {
 	results: ITunesResult[];
 }
 
-// --- Shared Utilities ---
-
 // Extracts a numeric iTunes/Apple Music track or album ID from a URL.
 // Prefers the ?i= track parameter over the album ID in the path.
 const extractAppleId = (url: string): string | null => {
-	// Prefer ?i= for a specific track
 	const trackMatch = url.match(/[?&]i=(\d+)/);
 	if (trackMatch) return trackMatch[1] ?? null;
 
@@ -29,18 +36,16 @@ const extractAppleId = (url: string): string | null => {
 	return albumMatch ? (albumMatch[1] ?? null) : null;
 };
 
-// Fetches one or more iTunes records by ID (comma-separated for batch).
+// Batch-fetches iTunes records.
 const fetchITunesRecords = async (ids: string): Promise<ITunesResult[]> => {
 	const res = await fetch(`https://itunes.apple.com/lookup?id=${ids}`);
 	const json = (await res.json()) as ITunesLookupResponse;
 	return json.results ?? [];
 };
 
-// --- Exports ---
+// Exports
 
-// Searches the Apple Music public search page by artist + song name, then
-// validates candidates against the iTunes Lookup API using Levenshtein scoring.
-// Returns the best-matching Apple Music track URL, or null if none found.
+// Scrapes the Apple Music public search page for a track, validating candidates against the iTunes API via Levenshtein scoring.
 export const lookupAppleTrackByInfo = async (
 	artist: string,
 	song: string,
@@ -99,11 +104,7 @@ export const lookupAppleTrackByInfo = async (
 	return bestLink;
 };
 
-// Resolves an Apple Music link to a Deezer track (ISRC + link) by:
-//   1. Extracting the iTunes ID from the URL (track ?i= or album path fallback)
-//   2. Fetching metadata from the iTunes Lookup API
-//   3. Running a fuzzy Deezer search scored by Levenshtein distance
-// Returns null if any step fails to produce a confident match.
+// Bridges Apple Music to a universal Deezer track (with ISRC) via the iTunes Lookup API and fuzzy matching.
 export const lookupAppleTrackByLink = async (url: string): Promise<TrackInfo | null> => {
 	const appleId = extractAppleId(url);
 	if (!appleId) return null;

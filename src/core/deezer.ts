@@ -31,13 +31,12 @@ const DIRECT_TRACK_ID_PATTERN = /(?:www\.)?deezer\.com\/(?:\w{2}\/)?track\/([0-9
 const SHORT_LINK_PATTERN = /link\.deezer\.com\/s\//;
 
 export const extractDeezerTrackId = async (url: string): Promise<string | null> => {
-	// Try the direct format first
 	const directMatch = url.match(DIRECT_TRACK_ID_PATTERN);
 	if (directMatch) {
 		return directMatch[1] ?? null;
 	}
 
-	// For short links, follow the redirect and extract the ID from the resolved URL
+	// Follow redirects for short links.
 	if (SHORT_LINK_PATTERN.test(url)) {
 		const response = await fetch(url, {
 			method: 'HEAD',
@@ -75,7 +74,6 @@ export const fetchDeezerTrackInfo = async (trackId: string): Promise<TrackInfo> 
 };
 
 // Looks up a track by ISRC using the Deezer public API.
-// Returns the track ID, name, artist(s), ISRC, and a canonical Deezer link.
 export const lookupDeezerTrackByIsrc = async (isrc: string): Promise<DeezerTrackLookup> => {
 	const response = await fetch(`https://api.deezer.com/track/isrc:${encodeURIComponent(isrc)}`);
 

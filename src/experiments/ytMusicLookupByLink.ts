@@ -1,3 +1,10 @@
+// YT Music Lookup By Link Experiment
+//
+// Manual testing script to verify the resolution of a YouTube Music link
+// to a universal Deezer track.
+//
+// Usage: bun run src/experiments/ytMusicLookupByLink.ts "https://music.youtube.com/watch?v=..."
+
 import { lookupYtMusicTrackByLink } from '../core/ytMusic';
 
 const main = async () => {

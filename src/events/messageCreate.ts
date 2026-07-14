@@ -52,7 +52,7 @@ export const registerMessageHandler = (client: Client): void => {
 		if (!guildHasPlatformEnabled) return;
 
 		try {
-			// Step 1: Resolve the track info (name, artists, ISRC) from the source link
+			// Resolve the track info (name, artists, ISRC) from the source link
 			const track = await resolveTrackInfo(platform, message.content);
 			if (!track) {
 				await message.reply(`${platform} link detected, but could not resolve track info.`);
@@ -66,14 +66,14 @@ export const registerMessageHandler = (client: Client): void => {
 				return;
 			}
 
-			// Step 2: Fan out ISRC lookups to all other enabled platforms in parallel (excluding the source platform)
+			// Fan out ISRC lookups to all other enabled platforms in parallel (excluding the source platform)
 			const enabledPlatforms = Object.entries(guildSettings.services)
 				.filter(([p, enabled]) => enabled && p !== platform)
 				.map(([p]) => p as Platform);
 
 			const resolvedLinks = await resolveLinksFromTrack(enabledPlatforms, track);
 
-			// Step 3: Build platform buttons
+			// Build platform buttons
 			const rows = generatePlatformButtons(
 				guildSettings.services,
 				client.config,

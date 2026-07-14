@@ -1,3 +1,9 @@
+// Apple Lookup By Info Experiment
+//
+// Manual testing script to verify the hybrid Apple Music scraping approach.
+//
+// Usage: bun run src/experiments/appleLookupByInfo.ts "Artist Name" "Song Title"
+
 import { lookupAppleTrackByInfo } from '../core/appleMusic';
 
 const main = async () => {

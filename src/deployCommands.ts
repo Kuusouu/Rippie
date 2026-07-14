@@ -8,19 +8,15 @@ import { env } from './env';
 const commands: unknown[] = [];
 const commandFileExtensions = ['.js', '.ts'];
 
-// Construct and prepare an instance of the REST module
 const rest = new REST().setToken(env.TOKEN);
 const guildIds = env.GUILDS;
 
-// and deploy your commands!
 (async () => {
 	try {
-		// Grab all the command folders from the commands directory
 		const foldersPath = path.join(import.meta.dir, 'commands');
 		const commandFolders = fs.readdirSync(foldersPath);
 
 		for (const folder of commandFolders) {
-			// Grab all the command files from the commands directory
 			const commandsPath = path.join(foldersPath, folder);
 			const commandFiles = fs
 				.readdirSync(commandsPath)
@@ -28,7 +24,6 @@ const guildIds = env.GUILDS;
 					commandFileExtensions.some((extension) => file.endsWith(extension)),
 				);
 
-			// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
 			for (const file of commandFiles) {
 				const filePath = path.join(commandsPath, file);
 				const commandModule = await import(filePath);
@@ -52,7 +47,6 @@ const guildIds = env.GUILDS;
 		);
 
 		for (const guildId of guildIds) {
-			// The put method is used to fully refresh all commands in each guild with the current set
 			const data = (await rest.put(Routes.applicationGuildCommands(env.CLIENTID, guildId), {
 				body: commands,
 			})) as unknown[];

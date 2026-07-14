@@ -21,7 +21,6 @@ const getYTMusic = async (): Promise<YTMusic> => {
 	return ytmusicInstance;
 };
 
-// Extracts a YouTube video ID from a standard URL or short link
 export const extractYtMusicId = (url: string): string | null => {
 	try {
 		const urlObj = new URL(url);
@@ -72,11 +71,7 @@ export const lookupYtMusicTrackByInfo = async (
 	return `https://music.youtube.com/watch?v=${bestCandidate.videoId}`;
 };
 
-// Resolves a YouTube Music link to a Deezer track (ISRC + link) by:
-//   1. Extracting the video ID from the URL
-//   2. Fetching metadata from YouTube Music API
-//   3. Running a fuzzy Deezer search scored by Levenshtein distance
-// Returns null if any step fails to produce a confident match.
+// Resolves a YouTube Music link to a Deezer track (for ISRC) using the YouTube Music API and fuzzy matching.
 export const lookupYtMusicTrackByLink = async (url: string): Promise<TrackInfo | null> => {
 	const videoId = extractYtMusicId(url);
 	if (!videoId) return null;

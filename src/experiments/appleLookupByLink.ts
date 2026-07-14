@@ -1,3 +1,10 @@
+// Apple Lookup By Link Experiment
+//
+// Manual testing script to verify the resolution of an Apple Music link
+// to a universal Deezer track using the iTunes API.
+//
+// Usage: bun run src/experiments/appleLookupByLink.ts "https://music.apple.com/us/album/..."
+
 import { lookupAppleTrackByLink } from '../core/appleMusic';
 
 const main = async () => {
