@@ -61,7 +61,7 @@ Rippie started as a Python project. Along the way I decided to challenge myself 
 
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-Please check out our [Contributing Guidelines](CONTRIBUTING.md) to learn how you can help (whether it's reporting bugs, suggesting features, or submitting code), and be sure to review our [Best Practices](.gemini/best-practices.md) before submitting any PRs.
+Please check out our [Contributing Guidelines](CONTRIBUTING.md) to learn how you can help (whether it's reporting bugs, suggesting features, or submitting code), and be sure to review our [Best Practices](docs/best-practices.md) before submitting any PRs.
 
 ## 📄 License
 

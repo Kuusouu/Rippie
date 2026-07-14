@@ -14,14 +14,14 @@ the header has the following format:
 ```
 
 - the scope is a noun describing a section of the codebase
-  - examples: `commands`, `core`, `events`, `config`, `docs`, `chore`, `ci`
+    - examples: `commands`, `core`, `events`, `config`, `docs`, `chore`, `ci`
 - the subject is a short description of the change that
-  - should not exceed 50 characters
-  - should be in the imperative mood
-  - should start with a lowercase letter and end with a lowercase letter or a number
+    - should not exceed 50 characters
+    - should be in the imperative mood
+    - should start with a lowercase letter and end with a lowercase letter or a number
 - lines separating message sections (if present) should be empty
 - the body (if present) contains a more detailed description of the change
-  - each line should not exceed 72 characters
+    - each line should not exceed 72 characters
 - the header can optionally contain multiple messages separated by `; `
 
 ## examples

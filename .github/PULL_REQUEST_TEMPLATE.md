@@ -22,7 +22,7 @@ Rippie relies heavily on external APIs. Please describe the tests that you ran t
 ## Checklist:
 
 - [ ] I have read the `CONTRIBUTING.md` document.
-- [ ] I have read and followed `.gemini/best-practices.md`.
+- [ ] I have read and followed [docs/best-practices.md](../docs/best-practices.md).
 - [ ] I have run `bun run format` on my code.
 - [ ] My code strictly types new data and avoids `any`.
 - [ ] (If applicable) I have noted if AI was used to generate this PR.

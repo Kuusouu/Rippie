@@ -20,12 +20,12 @@ Have an idea for a new feature or music platform integration? Great! Open an iss
 
 1. **Fork the repo** and clone it locally.
 2. **Install dependencies** using `bun install`.
-3. **Read our Best Practices**: All code (whether written by humans or AI agents) must follow the standards outlined in `.gemini/best-practices.md`.
+3. **Read our Best Practices**: All code (whether written by humans or AI agents) must follow the standards outlined in [docs/best-practices.md](./docs/best-practices.md).
 4. **Create a branch** for your feature or bug fix (`git checkout -b feature/my-new-platform`).
 5. **Write your code** and make sure things are strictly typed. Avoid `any`.
 6. **Format and lint**: Run `bun run format` and `bun run format-check` before committing.
 7. **Test manually**: Rippie interacts with multiple external APIs (Spotify, Apple Music, etc.). Ensure you have manually tested your changes against real links in a Discord server or the experiments (these are thin CLI wrappers for the core functionality).
-8. **Commit your changes**: Keep commit messages concise. Explanations are fine, but avoid writing a wall of text. You MUST follow the custom commit conventions defined in [.gemini/commit-conventions.md](./.gemini/commit-conventions.md) (standard [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) is also fine).
+8. **Commit your changes**: Keep commit messages concise. Explanations are fine, but avoid writing a wall of text. You MUST follow the custom commit conventions defined in [docs/commit-conventions.md](./docs/commit-conventions.md) (standard [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) is also fine).
 
 ## Pull Requests
 
