@@ -1,5 +1,5 @@
 import {
-	ChatInputCommandInteraction,
+	type ChatInputCommandInteraction,
 	EmbedBuilder,
 	MessageFlags,
 	SlashCommandBuilder,

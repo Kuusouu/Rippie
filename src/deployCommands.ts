@@ -1,8 +1,8 @@
 // Credits to the discord.js Get Started Guide
 
-import { REST, Routes } from 'discord.js';
 import fs from 'node:fs';
 import path from 'node:path';
+import { REST, Routes } from 'discord.js';
 import { env } from './env';
 
 const commands: unknown[] = [];

@@ -1,4 +1,4 @@
-import { Collection, PermissionsBitField } from 'discord.js';
+import { type Collection, PermissionsBitField } from 'discord.js';
 import type { SettingsStore } from './types';
 
 export const getMemberRoleIds = (

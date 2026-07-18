@@ -1,5 +1,5 @@
 import { Collection } from 'discord.js';
-import { BotConfig, SettingsStore, Command } from './types';
+import { BotConfig, Command, SettingsStore } from './types';
 
 // Module augmentation, commands are available within the Discord Client class without a explicit cast or
 // separate class

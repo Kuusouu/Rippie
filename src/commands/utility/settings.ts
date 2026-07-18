@@ -1,6 +1,6 @@
 import {
 	ActionRowBuilder,
-	ChatInputCommandInteraction,
+	type ChatInputCommandInteraction,
 	EmbedBuilder,
 	MessageFlags,
 	SlashCommandBuilder,

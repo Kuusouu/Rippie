@@ -22,11 +22,8 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Check formatting
-        run: bun run format
-
-      - name: Run ESLint
-        run: bun run lint
+      - name: Run Biome
+        run: bun run check
 
       - name: Run TypeScript build check
         run: bun run build

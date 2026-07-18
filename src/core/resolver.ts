@@ -48,7 +48,7 @@ export const resolveLinksFromTrack = async (
 		platforms
 			.filter((p) => resolvers[p])
 			.map(async (p): Promise<[Platform, string] | null> => {
-				const link = await resolvers[p]!();
+				const link = await resolvers[p]?.();
 				return link ? [p, link] : null;
 			}),
 	);

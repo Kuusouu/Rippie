@@ -8,10 +8,12 @@
 		"build": "tsc --noEmit",
 		"start": "bun src/main.ts",
 		"sync": "bun src/deployCommands.ts",
-		"lint": "bunx eslint .",
-		"lint:fix": "bunx eslint . --fix",
-		"format": "bunx prettier --check .",
-		"format:fix": "bunx prettier --write .",
+		"lint": "bunx biome lint .",
+		"lint:fix": "bunx biome lint --write .",
+		"check": "bunx biome check .",
+		"check:fix": "bunx biome check --write .",
+		"format": "bunx biome format .",
+		"format:fix": "bunx biome format --write .",
 		"prepare": "husky"
 	},
 	"repository": {
@@ -35,14 +37,10 @@
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {
-		"@eslint/js": "^10.0.1",
+		"@biomejs/biome": "2.5.4",
 		"@types/bun": "^1.3.14",
 		"@types/node": "^26.0.1",
-		"eslint": "^10.5.0",
-		"eslint-config-prettier": "^10.1.8",
 		"husky": "^9.1.7",
-		"prettier": "^3.8.4",
-		"typescript": "^6.0.3",
-		"typescript-eslint": "^8.63.0"
+		"typescript": "^6.0.3"
 	}
 }

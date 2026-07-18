@@ -1,4 +1,4 @@
-import { Client, Events } from 'discord.js';
+import { type Client, Events } from 'discord.js';
 import { generatePlatformButtons } from '../buttons';
 import { lookupAppleTrackByLink } from '../core/appleMusic';
 import { extractDeezerTrackId, fetchDeezerTrackInfo } from '../core/deezer';

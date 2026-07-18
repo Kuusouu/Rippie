@@ -4,7 +4,7 @@ import {
 	ButtonStyle,
 	ChannelSelectMenuBuilder,
 	ChannelType,
-	Client,
+	type Client,
 	EmbedBuilder,
 	Events,
 	MessageFlags,

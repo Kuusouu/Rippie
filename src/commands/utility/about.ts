@@ -2,7 +2,7 @@ import {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonStyle,
-	ChatInputCommandInteraction,
+	type ChatInputCommandInteraction,
 	EmbedBuilder,
 	SlashCommandBuilder,
 } from 'discord.js';
